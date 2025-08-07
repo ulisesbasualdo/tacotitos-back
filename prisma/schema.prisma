@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Alimento {
+  id           String   @id @default(uuid())
+  nombre       String
+  tipoAlimento String   // 'alimentoTortilla' | 'salsa'
+  precio       Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relaciones
+  tacosComoSalsa Taco[] @relation("TacoSalsa")
+  tacosContenido TacoAlimentos[]
+  @@map("alimentos")
+}
+
+model Tortilla {
+  id        String   @id @default(uuid())
+  nombre    String
+  precio    Float
+  tipoTortilla String @default("simple")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relaciones
+  tacos     Taco[]
+  @@map("tortillas")
+}
+
+model Taco {
+  id         String   @id @default(uuid())
+  tortillaId String
+  salsaId    String?  // Opcional porque la salsa puede ser null
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relaciones
+  tortilla   Tortilla @relation(fields: [tortillaId], references: [id])
+  salsa      Alimento? @relation("TacoSalsa", fields: [salsaId], references: [id])
+  alimentos  TacoAlimentos[]
+
+
+  @@map("tacos")
+}
+
+model TacoAlimentos {
+  id          String       @id @default(uuid())
+  tacoId      String
+  alimentoId  String
+  createdAt   DateTime @default(now())
+  
+  // Relaciones
+  taco        Taco     @relation(fields: [tacoId], references: [id])
+  alimento    Alimento @relation(fields: [alimentoId], references: [id])
+  
+  @@unique([tacoId, alimentoId])
+  @@map("taco_alimentos")
+}

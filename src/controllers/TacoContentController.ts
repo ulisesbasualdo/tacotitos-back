@@ -47,6 +47,37 @@ export class TacoContentController {
     }
   }
 
+  public static async actualizarTortilla(id: string, tortillaData: ITacoContent): Promise<ITacoContent> {
+    const controller = new TacoContentController();
+
+    try {
+      // Validar que los datos necesarios estén presentes
+      if (!tortillaData.nombre || tortillaData.precio === undefined) {
+        throw new Error(
+          "Nombre y precio son requeridos para actualizar una tortilla"
+        );
+      }
+
+      // Actualizar la tortilla en la base de datos
+      const tortillaActualizada = await controller.prisma.tortilla.update({
+        where: { id },
+        data: {
+          nombre: tortillaData.nombre,
+          precio: tortillaData.precio,
+        },
+      });
+
+      return {
+        id: tortillaActualizada.id,
+        nombre: tortillaActualizada.nombre,
+        precio: tortillaActualizada.precio,
+      };
+    } catch (error) {
+      console.error("Error al actualizar tortilla:", error);
+      throw new Error("Error al actualizar tortilla en la base de datos: " + error);
+    }
+  }
+
   public static async eliminarTortilla(id: string): Promise<void> {
     const controller = new TacoContentController();
 

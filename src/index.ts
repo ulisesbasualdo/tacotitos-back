@@ -43,7 +43,7 @@ app.post('/tacos', async (req: Request, res: Response) => {
   }
 });
 
-//obtener tortillas
+//#region Tortillas
 app.get('/tacos/tortillas', async (req: Request, res: Response) => {
   try {
     const tortillas = await tacoView.getTortillas();
@@ -65,6 +65,18 @@ app.post('/tacos/tortillas', async (req: Request, res: Response) => {
   }
 });
 
+app.put('/tacos/tortillas/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const tortillaActualizada = await TacoContentController.actualizarTortilla(id, req.body);
+    res.json(tortillaActualizada);
+    console.info('Tortilla actualizada datos nuevos: ', { id, ...tortillaActualizada });
+  } catch (error) {
+    console.error('Error en PUT /tacos/tortillas/:id:', error);
+    res.status(500).json({ error: 'Error al actualizar tortilla' });
+  }
+});
+
 app.delete('/tacos/tortillas/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -77,6 +89,7 @@ app.delete('/tacos/tortillas/:id', async (req: Request, res: Response) => {
   }
 });
 
+//#region Estadísticas
 app.get('/tacos/stats/cheapest', async (req: Request, res: Response) => {
   try {
     const taco = await tacoView.mostrarTacoMasEconomico();

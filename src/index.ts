@@ -2,8 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors'; // Agregar esta importación
 import { TacoView } from './views/TacoView';
 import { ITaco } from './interfaces/i-taco';
-import { TacoController } from './controllers/TacoController';
 import { TacoContentController } from './controllers/TacoContentController';
+import { AlimentoController } from './controllers/AlimentoController';
 
 const app = express();
 const PORT = 3000;
@@ -86,6 +86,102 @@ app.delete('/tacos/tortillas/:id', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error en DELETE /tacos/tortillas/:id:', error);
     res.status(500).json({ error: 'Error al eliminar tortilla' });
+  }
+});
+
+//#region Alimentos
+app.get('/tacos/alimentos', async (req: Request, res: Response) => {
+  try {
+    const alimentoController = new AlimentoController();
+    const alimentos = await alimentoController.getAlimentosTortilla();
+    res.json(alimentos);
+  } catch (error) {
+    console.error('Error en GET /tacos/alimentos:', error);
+    res.status(500).json({ error: 'Error al obtener alimentos' });
+  }
+});
+
+app.post('/tacos/alimentos', async (req: Request, res: Response) => {
+  try {
+    const alimentoCreado = await AlimentoController.crearAlimento(req.body);
+    res.status(201).json(alimentoCreado);
+    console.info('Alimento creado', { alimentoCreado });
+  } catch (error) {
+    console.error('Error en POST /tacos/alimentos:', error);
+    res.status(500).json({ error: 'Error al crear alimento' });
+  }
+});
+
+app.put('/tacos/alimentos/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const alimentoActualizado = await AlimentoController.actualizarAlimento(id, req.body);
+    res.json(alimentoActualizado);
+    console.info('Alimento actualizado datos nuevos: ', { id, ...alimentoActualizado });
+  } catch (error) {
+    console.error('Error en PUT /tacos/alimentos/:id:', error);
+    res.status(500).json({ error: 'Error al actualizar alimento' });
+  }
+});
+
+app.delete('/tacos/alimentos/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await AlimentoController.eliminarAlimento(id);
+    res.status(204).send();
+    console.info('Alimento eliminado con ID:', id);
+  } catch (error) {
+    console.error('Error en DELETE /tacos/alimentos/:id:', error);
+    res.status(500).json({ error: 'Error al eliminar alimento' });
+  }
+});
+
+//#region Salsas
+app.get('/tacos/salsas', async (req: Request, res: Response) => {
+  try {
+    const alimentoController = new AlimentoController();
+    const salsas = await alimentoController.getSalsas();
+    res.json(salsas);
+  } catch (error) {
+    console.error('Error en GET /tacos/salsas:', error);
+    res.status(500).json({ error: 'Error al obtener salsas' });
+  }
+});
+
+app.post('/tacos/salsas', async (req: Request, res: Response) => {
+  try {
+    const salsaData = { ...req.body, tipoAlimento: 'salsa' };
+    const salsaCreada = await AlimentoController.crearAlimento(salsaData);
+    res.status(201).json(salsaCreada);
+    console.info('Salsa creada', { salsaCreada });
+  } catch (error) {
+    console.error('Error en POST /tacos/salsas:', error);
+    res.status(500).json({ error: 'Error al crear salsa' });
+  }
+});
+
+app.put('/tacos/salsas/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const salsaData = { ...req.body, tipoAlimento: 'salsa' };
+    const salsaActualizada = await AlimentoController.actualizarAlimento(id, salsaData);
+    res.json(salsaActualizada);
+    console.info('Salsa actualizada datos nuevos: ', { id, ...salsaActualizada });
+  } catch (error) {
+    console.error('Error en PUT /tacos/salsas/:id:', error);
+    res.status(500).json({ error: 'Error al actualizar salsa' });
+  }
+});
+
+app.delete('/tacos/salsas/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await AlimentoController.eliminarAlimento(id);
+    res.status(204).send();
+    console.info('Salsa eliminada con ID:', id);
+  } catch (error) {
+    console.error('Error en DELETE /tacos/salsas/:id:', error);
+    res.status(500).json({ error: 'Error al eliminar salsa' });
   }
 });
 

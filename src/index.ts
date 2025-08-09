@@ -58,9 +58,22 @@ app.post('/tacos/tortillas', async (req: Request, res: Response) => {
   try {
     const tortillaCreada = await TacoContentController.crearTortilla(req.body);
     res.status(201).json(tortillaCreada);
+    console.info('tortilla Creada', {tortillaCreada})
   } catch (error) {
     console.error('Error en POST /tacos/tortillas:', error);
     res.status(500).json({ error: 'Error al crear tortilla' });
+  }
+});
+
+app.delete('/tacos/tortillas/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await TacoContentController.eliminarTortilla(id);
+    res.status(204).send();
+    console.info('Tortilla eliminada con ID:', id);
+  } catch (error) {
+    console.error('Error en DELETE /tacos/tortillas/:id:', error);
+    res.status(500).json({ error: 'Error al eliminar tortilla' });
   }
 });
 

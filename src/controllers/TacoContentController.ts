@@ -46,4 +46,17 @@ export class TacoContentController {
       throw new Error("Error al crear tortilla en la base de datos: " + error);
     }
   }
+
+  public static async eliminarTortilla(id: string): Promise<void> {
+    const controller = new TacoContentController();
+
+    try {
+      await controller.prisma.tortilla.delete({
+        where: { id },
+      });
+    } catch (error) {
+      console.error("Error al eliminar tortilla:", error);
+      throw new Error("Error al eliminar tortilla en la base de datos: " + error);
+    }
+  }
 }

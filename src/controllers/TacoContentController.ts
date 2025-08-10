@@ -90,4 +90,20 @@ export class TacoContentController {
       throw new Error("Error al eliminar tortilla en la base de datos: " + error);
     }
   }
+
+  //#region utils
+
+  public static async getCheapestTortilla(): Promise<ITacoContent | null> {
+    const controller = new TacoContentController();
+
+    try {
+      const cheapestTortilla = await controller.prisma.tortilla.findFirst({
+        orderBy: { precio: "asc" },
+      });
+      return cheapestTortilla;
+    } catch (error) {
+      console.error("Error al obtener la tortilla más barata:", error);
+      throw new Error("Error al obtener la tortilla más barata en la base de datos: " + error);
+    }
+  }
 }

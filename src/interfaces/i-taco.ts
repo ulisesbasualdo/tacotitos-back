@@ -7,3 +7,10 @@ export interface ITaco {
     salsa?: IAlimento;
     alimentos: IAlimento[];
 }
+
+export interface ITacoStats {
+    valor: number | null;
+    tipoTortilla: string | null;
+    salsa: string | null;
+    alimentos: string[] | null;
+}

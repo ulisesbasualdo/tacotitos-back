@@ -115,4 +115,38 @@ export class AlimentoController {
       throw new Error("Error al eliminar alimento en la base de datos: " + error);
     }
   }
+
+  //#region utils
+
+  public static async getCheapestAlimentosDeTortilla(): Promise<IAlimento[] | null> {
+    const controller = new AlimentoController();
+
+    try {
+      // encontrar primeros 5 mas caros
+      const cheapestAlimentos = await controller.prisma.alimento.findMany({
+        where: { tipoAlimento: "alimentoTortilla" },
+        orderBy: { precio: "asc" },
+        take: 5,
+      });
+      return cheapestAlimentos as IAlimento[];
+    } catch (error) {
+      console.error("Error al obtener el alimento de tortilla más barato:", error);
+      throw new Error("Error al obtener el alimento de tortilla más barato en la base de datos: " + error);
+    }
+  }
+
+  public static async getCheapestSalsa(): Promise<IAlimento | null> {
+    const controller = new AlimentoController();
+
+    try {
+      const cheapestSalsa = await controller.prisma.alimento.findFirst({
+        where: { tipoAlimento: "salsa" },
+        orderBy: { precio: "asc" },
+      });
+      return cheapestSalsa as IAlimento;
+    } catch (error) {
+      console.error("Error al obtener la salsa más barata:", error);
+      throw new Error("Error al obtener la salsa más barata en la base de datos: " + error);
+    }
+  }
 }

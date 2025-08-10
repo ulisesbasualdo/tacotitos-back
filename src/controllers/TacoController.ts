@@ -1,10 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { ITaco } from "../interfaces/i-taco";
+import { ITaco, ITacoStats } from "../interfaces/i-taco";
 import { Alimento } from "../models/Alimento";
 import { Taco } from "../models/Taco";
 import { Tortilla } from "../models/Tortilla";
 import { IAlimento } from "../interfaces/i-alimento";
 import { Utils } from "../utils/utils";
+import { AlimentoController } from "./AlimentoController";
+import { TacoContentController } from "./TacoContentController";
 
 export class TacoController {
   private readonly prisma: PrismaClient;
@@ -129,14 +131,41 @@ export class TacoController {
 
   //#region UTILS
 
-  public async getTacoMasEconomico(): Promise<ITaco | null> {
-    const tacos = await this.getTacos();
-    if (tacos.length === 0) return null;
-    return tacos.reduce((prev, curr) => {
-      return this.getPrecioCosto(prev) < this.getPrecioCosto(curr)
-        ? prev
-        : curr;
-    }, tacos[0]);
+  public async getCheapestTaco(): Promise<ITacoStats | null> {
+    try {
+      const cheapestSalsa = await AlimentoController.getCheapestSalsa();
+      const cheapestAlimentosDeTortilla =
+        await AlimentoController.getCheapestAlimentosDeTortilla();
+      const cheapestTortilla =
+        await TacoContentController.getCheapestTortilla();
+
+      if (!cheapestSalsa && !cheapestAlimentosDeTortilla && !cheapestTortilla)
+        return null;
+
+      const valorTotal =
+        (cheapestTortilla?.precio || 0) +
+        (cheapestSalsa?.precio || 0) +
+        (cheapestAlimentosDeTortilla?.reduce(
+          (sum, alimento) => sum + (alimento.precio || 0),
+          0
+        ) || 0);
+
+      const cheapestTaco: ITacoStats = {
+        valor: valorTotal || null,
+        tipoTortilla: cheapestTortilla?.nombre || null,
+        salsa: cheapestSalsa?.nombre || null,
+        alimentos:
+          cheapestAlimentosDeTortilla?.map((alimento) => alimento.nombre) ||
+          null,
+      };
+
+      return cheapestTaco;
+    } catch (error) {
+      console.error("Error al obtener el taco más barato:", error);
+      throw new Error(
+        "Error al obtener el taco más barato en la base de datos: " + error
+      );
+    }
   }
 
   public async getTacoMasCostoso(): Promise<ITaco | null> {

@@ -1,5 +1,5 @@
 import { TacoController } from "../controllers/TacoController";
-import { ITaco } from "../interfaces/i-taco";
+import { ITaco, ITacoStats } from "../interfaces/i-taco";
 import { TacoContentController } from '../controllers/TacoContentController';
 import { ITacoContent } from "../interfaces/i-taco-content";
 
@@ -11,8 +11,8 @@ export class TacoView {
         return this.tacoController.getTacos();
     }
 
-    public mostrarTacoMasEconomico(): Promise<ITaco | null> {
-        return this.tacoController.getTacoMasEconomico();
+    public mostrarTacoMasEconomico(): Promise<ITacoStats | null> {
+        return this.tacoController.getCheapestTaco();
     }
     public mostrarTacoMasCostoso(): Promise<ITaco | null> {
         return this.tacoController.getTacoMasCostoso();

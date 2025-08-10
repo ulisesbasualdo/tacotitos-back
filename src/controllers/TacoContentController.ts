@@ -106,4 +106,31 @@ export class TacoContentController {
       throw new Error("Error al obtener la tortilla más barata en la base de datos: " + error);
     }
   }
+
+  public static async getExpensiveTortilla(): Promise<ITacoContent | null> {
+    const controller = new TacoContentController();
+
+    try {
+      const expensiveTortilla = await controller.prisma.tortilla.findFirst({
+        orderBy: { precio: "desc" },
+      });
+      return expensiveTortilla;
+    } catch (error) {
+      console.error("Error al obtener la tortilla más cara:", error);
+      throw new Error("Error al obtener la tortilla más cara en la base de datos: " + error);
+    }
+  }
+
+  public static async getAverageTortilla(): Promise<number> {
+    const controller = new TacoContentController();
+
+    try {
+      const tortillas = await controller.prisma.tortilla.findMany();
+      const total = tortillas.reduce((sum, tortilla) => sum + (tortilla.precio || 0), 0);
+      return tortillas.length > 0 ? total / tortillas.length : 0;
+    } catch (error) {
+      console.error("Error al obtener el precio promedio de las tortillas:", error);
+      throw new Error("Error al obtener el precio promedio de las tortillas en la base de datos: " + error);
+    }
+  }
 }

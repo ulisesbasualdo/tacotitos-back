@@ -14,11 +14,11 @@ export class TacoView {
     public mostrarTacoMasEconomico(): Promise<ITacoStats | null> {
         return this.tacoController.getCheapestTaco();
     }
-    public mostrarTacoMasCostoso(): Promise<ITaco | null> {
-        return this.tacoController.getTacoMasCostoso();
+    public mostrarTacoMasCostoso(): Promise<ITacoStats | null> {
+        return this.tacoController.getExpensiveTaco();
     }
     public mostrarValorPromedioDeUnTaco(): Promise<number> {
-        return this.tacoController.getValorPromedioDeUnTaco();
+        return this.tacoController.getAverageTacoPrice();
     }
 
     public getTortillas(): Promise<ITacoContent[]> {

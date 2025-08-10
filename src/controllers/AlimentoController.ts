@@ -149,4 +149,64 @@ export class AlimentoController {
       throw new Error("Error al obtener la salsa más barata en la base de datos: " + error);
     }
   }
+
+  public static async getExpensiveSalsa(): Promise<IAlimento | null> {
+    const controller = new AlimentoController();
+
+    try {
+      const expensiveSalsa = await controller.prisma.alimento.findFirst({
+        where: { tipoAlimento: "salsa" },
+        orderBy: { precio: "desc" },
+      });
+      return expensiveSalsa as IAlimento;
+    } catch (error) {
+      console.error("Error al obtener la salsa más cara:", error);
+      throw new Error("Error al obtener la salsa más cara en la base de datos: " + error);
+    }
+  }
+
+  public static async getExpensiveAlimentosDeTortilla(): Promise<IAlimento[] | null> {
+    const controller = new AlimentoController();
+
+    try {
+      const expensiveAlimentos = await controller.prisma.alimento.findMany({
+        where: { tipoAlimento: "alimentoTortilla" },
+        orderBy: { precio: "desc" },
+      });
+      return expensiveAlimentos as IAlimento[];
+    } catch (error) {
+      console.error("Error al obtener los alimentos de tortilla más caros:", error);
+      throw new Error("Error al obtener los alimentos de tortilla más caros en la base de datos: " + error);
+    }
+  }
+
+  public static async getAverageAlimentosDeTortilla(): Promise<number> {
+    const controller = new AlimentoController();
+
+    try {
+      const alimentos = await controller.prisma.alimento.findMany({
+        where: { tipoAlimento: "alimentoTortilla" },
+      });
+      const total = alimentos.reduce((sum, alimento) => sum + (alimento.precio || 0), 0);
+      return alimentos.length > 0 ? total / alimentos.length : 0;
+    } catch (error) {
+      console.error("Error al obtener el precio promedio de los alimentos de tortilla:", error);
+      throw new Error("Error al obtener el precio promedio de los alimentos de tortilla en la base de datos: " + error);
+    }
+  }
+
+  public static async getAverageSalsaPrice(): Promise<number> {
+    const controller = new AlimentoController();
+
+    try {
+      const salsas = await controller.prisma.alimento.findMany({
+        where: { tipoAlimento: "salsa" },
+      });
+      const total = salsas.reduce((sum, salsa) => sum + (salsa.precio || 0), 0);
+      return salsas.length > 0 ? total / salsas.length : 0;
+    } catch (error) {
+      console.error("Error al obtener el precio promedio de las salsas:", error);
+      throw new Error("Error al obtener el precio promedio de las salsas en la base de datos: " + error);
+    }
+  }
 }

@@ -13,22 +13,14 @@ export class TacoContentController {
     return this.prisma.tortilla.findMany();
   }
 
-  public static async crearTortilla(tortillaData: ITacoContent): Promise<ITacoContent> {
-    const controller = new TacoContentController();
-
+  public async crearTortilla(tortillaData: ITacoContent): Promise<ITacoContent> {
     try {
-      // Validar que los datos necesarios estén presentes
       if (!tortillaData.nombre || tortillaData.precio === undefined) {
-        throw new Error(
-          "Nombre y precio son requeridos para crear una tortilla"
-        );
+        throw new Error("Nombre y precio son requeridos para crear una tortilla");
       }
 
-      // Generar ID único usando la utilidad existente
       const tortillaId = Utils.generarUUID();
-
-      // Crear la tortilla en la base de datos
-      const tortillaCreada = await controller.prisma.tortilla.create({
+      const tortillaCreada = await this.prisma.tortilla.create({
         data: {
           id: tortillaId,
           nombre: tortillaData.nombre,
@@ -47,9 +39,7 @@ export class TacoContentController {
     }
   }
 
-  public static async actualizarTortilla(id: string, tortillaData: ITacoContent): Promise<ITacoContent> {
-    const controller = new TacoContentController();
-
+  public async updateTortilla(id: string, tortillaData: ITacoContent): Promise<ITacoContent> {
     try {
       // Validar que los datos necesarios estén presentes
       if (!tortillaData.nombre || tortillaData.precio === undefined) {
@@ -57,9 +47,8 @@ export class TacoContentController {
           "Nombre y precio son requeridos para actualizar una tortilla"
         );
       }
-
       // Actualizar la tortilla en la base de datos
-      const tortillaActualizada = await controller.prisma.tortilla.update({
+      const tortillaActualizada = await this.prisma.tortilla.update({
         where: { id },
         data: {
           nombre: tortillaData.nombre,
@@ -78,7 +67,7 @@ export class TacoContentController {
     }
   }
 
-  public static async eliminarTortilla(id: string): Promise<void> {
+  public async deleteTortilla(id: string): Promise<void> {
     const controller = new TacoContentController();
 
     try {

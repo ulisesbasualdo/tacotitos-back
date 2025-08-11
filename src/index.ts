@@ -1,9 +1,8 @@
 import express, { Request, Response } from 'express';
-import cors from 'cors'; // Agregar esta importación
+import cors from 'cors';
 import { TacoView } from './views/TacoView';
-import { ITaco } from './interfaces/i-taco';
-import { TacoContentController } from './controllers/TacoContentController';
-import { AlimentoController } from './controllers/AlimentoController';
+import { AlimentoView } from './views/AlimentoView';
+import { TacoContentView } from './views/TacoContentView';
 
 const app = express();
 const PORT = 3000;
@@ -17,36 +16,13 @@ app.use(cors({
 app.use(express.json());
 
 const tacoView = new TacoView();
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hola mundo desde Express con TypeScript!');
-});
-
-app.get('/tacos', async (req: Request, res: Response) => {
-  try {
-    const tacos = await tacoView.mostrarTacos();
-    res.json(tacos);
-  } catch (error) {
-    console.error('Error en GET /tacos:', error);
-    res.status(500).json({ error: 'Error al obtener tacos' });
-  }
-});
-app.post('/tacos', async (req: Request, res: Response) => {
-  try {
-    const taco: ITaco = req.body;
-
-    const tacoCreado = await tacoView.agregarTaco(taco);
-    res.status(201).json(tacoCreado);
-  } catch (error) {
-    console.error('Error en POST /tacos:', error);
-    res.status(500).json({ error: 'Error al crear taco' });
-  }
-});
+const alimentoView= new AlimentoView();
+const tacoContentView = new TacoContentView();
 
 //#region Tortillas
 app.get('/tacos/tortillas', async (req: Request, res: Response) => {
   try {
-    const tortillas = await tacoView.getTortillas();
+    const tortillas = await tacoContentView.getTiposTortilla();
     res.json(tortillas);
   } catch (error) {
     console.error('Error en GET /tacos/tortillas:', error);
@@ -56,19 +32,19 @@ app.get('/tacos/tortillas', async (req: Request, res: Response) => {
 
 app.post('/tacos/tortillas', async (req: Request, res: Response) => {
   try {
-    const tortillaCreada = await TacoContentController.crearTortilla(req.body);
+    const tortillaCreada = await tacoContentView.addTortilla(req.body);
     res.status(201).json(tortillaCreada);
     console.info('tortilla Creada', {tortillaCreada})
   } catch (error) {
     console.error('Error en POST /tacos/tortillas:', error);
-    res.status(500).json({ error: 'Error al crear tortilla' });
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
 app.put('/tacos/tortillas/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const tortillaActualizada = await TacoContentController.actualizarTortilla(id, req.body);
+    const tortillaActualizada = await tacoContentView.updateTortilla(id, req.body);
     res.json(tortillaActualizada);
     console.info('Tortilla actualizada datos nuevos: ', { id, ...tortillaActualizada });
   } catch (error) {
@@ -80,7 +56,7 @@ app.put('/tacos/tortillas/:id', async (req: Request, res: Response) => {
 app.delete('/tacos/tortillas/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    await TacoContentController.eliminarTortilla(id);
+    await tacoContentView.deleteTortilla(id);
     res.status(204).send();
     console.info('Tortilla eliminada con ID:', id);
   } catch (error) {
@@ -92,8 +68,7 @@ app.delete('/tacos/tortillas/:id', async (req: Request, res: Response) => {
 //#region Alimentos
 app.get('/tacos/alimentos', async (req: Request, res: Response) => {
   try {
-    const alimentoController = new AlimentoController();
-    const alimentos = await alimentoController.getAlimentosTortilla();
+    const alimentos = await alimentoView.getAlimentosTortilla();
     res.json(alimentos);
   } catch (error) {
     console.error('Error en GET /tacos/alimentos:', error);
@@ -103,7 +78,7 @@ app.get('/tacos/alimentos', async (req: Request, res: Response) => {
 
 app.post('/tacos/alimentos', async (req: Request, res: Response) => {
   try {
-    const alimentoCreado = await AlimentoController.crearAlimento(req.body);
+    const alimentoCreado = await alimentoView.addAlimento(req.body);
     res.status(201).json(alimentoCreado);
     console.info('Alimento creado', { alimentoCreado });
   } catch (error) {
@@ -115,7 +90,7 @@ app.post('/tacos/alimentos', async (req: Request, res: Response) => {
 app.put('/tacos/alimentos/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const alimentoActualizado = await AlimentoController.actualizarAlimento(id, req.body);
+    const alimentoActualizado = await alimentoView.updateAlimento(id, req.body);
     res.json(alimentoActualizado);
     console.info('Alimento actualizado datos nuevos: ', { id, ...alimentoActualizado });
   } catch (error) {
@@ -127,7 +102,7 @@ app.put('/tacos/alimentos/:id', async (req: Request, res: Response) => {
 app.delete('/tacos/alimentos/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    await AlimentoController.eliminarAlimento(id);
+    await alimentoView.deleteAlimento(id);
     res.status(204).send();
     console.info('Alimento eliminado con ID:', id);
   } catch (error) {
@@ -139,8 +114,8 @@ app.delete('/tacos/alimentos/:id', async (req: Request, res: Response) => {
 //#region Salsas
 app.get('/tacos/salsas', async (req: Request, res: Response) => {
   try {
-    const alimentoController = new AlimentoController();
-    const salsas = await alimentoController.getSalsas();
+    
+    const salsas = await alimentoView.getSalsas();
     res.json(salsas);
   } catch (error) {
     console.error('Error en GET /tacos/salsas:', error);
@@ -151,7 +126,7 @@ app.get('/tacos/salsas', async (req: Request, res: Response) => {
 app.post('/tacos/salsas', async (req: Request, res: Response) => {
   try {
     const salsaData = { ...req.body, tipoAlimento: 'salsa' };
-    const salsaCreada = await AlimentoController.crearAlimento(salsaData);
+    const salsaCreada = await alimentoView.addAlimento(salsaData);
     res.status(201).json(salsaCreada);
     console.info('Salsa creada', { salsaCreada });
   } catch (error) {
@@ -164,7 +139,7 @@ app.put('/tacos/salsas/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const salsaData = { ...req.body, tipoAlimento: 'salsa' };
-    const salsaActualizada = await AlimentoController.actualizarAlimento(id, salsaData);
+    const salsaActualizada = await alimentoView.updateAlimento(id, salsaData);
     res.json(salsaActualizada);
     console.info('Salsa actualizada datos nuevos: ', { id, ...salsaActualizada });
   } catch (error) {
@@ -176,7 +151,7 @@ app.put('/tacos/salsas/:id', async (req: Request, res: Response) => {
 app.delete('/tacos/salsas/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    await AlimentoController.eliminarAlimento(id);
+    await alimentoView.deleteAlimento(id);
     res.status(204).send();
     console.info('Salsa eliminada con ID:', id);
   } catch (error) {
@@ -217,9 +192,7 @@ app.get('/tacos/stats/average-price', async (req: Request, res: Response) => {
   }
 });
 
-
-
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
-  console.log(`hola`)
+  console.log(`*************************\n**** TACOTITOS START ****\n*************************`)
 });

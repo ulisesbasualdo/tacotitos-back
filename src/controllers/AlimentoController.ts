@@ -35,9 +35,7 @@ export class AlimentoController {
     }));
   }
 
-  public static async crearAlimento(alimentoData: Partial<IAlimento>): Promise<IAlimento> {
-    const controller = new AlimentoController();
-
+  public async addAlimento(alimentoData: Partial<IAlimento>): Promise<IAlimento> {
     try {
       if (
         !alimentoData.nombre ||
@@ -51,7 +49,7 @@ export class AlimentoController {
 
       const alimentoId = Utils.generarUUID();
 
-      const alimentoCreado = await controller.prisma.alimento.create({
+      const alimentoCreado = await this.prisma.alimento.create({
         data: {
           id: alimentoId,
           nombre: alimentoData.nombre,
@@ -72,9 +70,7 @@ export class AlimentoController {
     }
   }
 
-  public static async actualizarAlimento(id: string, alimentoData: IAlimento): Promise<IAlimento> {
-    const controller = new AlimentoController();
-
+  public async updateAlimento(id: string, alimentoData: IAlimento): Promise<IAlimento> {
     try {
       if (!alimentoData.nombre || alimentoData.precio === undefined) {
         throw new Error(
@@ -82,7 +78,7 @@ export class AlimentoController {
         );
       }
 
-      const alimentoActualizado = await controller.prisma.alimento.update({
+      const alimentoActualizado = await this.prisma.alimento.update({
         where: { id },
         data: {
           nombre: alimentoData.nombre,
@@ -103,11 +99,9 @@ export class AlimentoController {
     }
   }
 
-  public static async eliminarAlimento(id: string): Promise<void> {
-    const controller = new AlimentoController();
-
+  public async deleteAlimento(id: string): Promise<void> {
     try {
-      await controller.prisma.alimento.delete({
+      await this.prisma.alimento.delete({
         where: { id },
       });
     } catch (error) {

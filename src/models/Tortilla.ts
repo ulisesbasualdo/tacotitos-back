@@ -1,13 +1,13 @@
 import { ITacoContent } from "../interfaces/i-taco-content";
 
-type TTipoTortilla = "simple" | "doble";
+type TTipoTortilla = "single" | "double";
 
 export class Tortilla implements ITacoContent {
-  private _id?: string;
-  public get id(): string | undefined {
+  private _id?: number;
+  public get id(): number | undefined {
     return this._id;
   }
-  public set id(value: string | undefined) {
+  public set id(value: number | undefined) {
     this._id = value;
   }
   private _nombre: string;
@@ -26,9 +26,9 @@ export class Tortilla implements ITacoContent {
   }
   private _tipoTortilla: TTipoTortilla;
   public set tipoTortilla(value: TTipoTortilla) {
-    if (value !== "simple" && value !== "doble") {
+    if (value !== "single" && value !== "double") {
       throw new Error(
-        "Tipo de tortilla no válido. Debe ser 'simple' o 'doble'."
+        "Tipo de tortilla no válido. Debe ser 'single' o 'double'."
       );
     }
     this._tipoTortilla = value;
@@ -41,7 +41,7 @@ export class Tortilla implements ITacoContent {
     nombre: string,
     precio: number,
     tipoTortilla: TTipoTortilla,
-    id?: string
+    id?: number
   ) {
     this._nombre = nombre;
     this._precio = precio;

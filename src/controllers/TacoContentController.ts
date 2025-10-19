@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { Utils } from "../utils/utils";
 import { ITacoContent } from "../interfaces/i-taco-content";
-// #region tortilla
+
 export class TacoContentController {
   private readonly prisma: PrismaClient;
 
@@ -9,20 +8,23 @@ export class TacoContentController {
     this.prisma = new PrismaClient();
   }
 
-  public async getTortillas(): Promise<ITacoContent[]> {
-    return this.prisma.tortilla.findMany();
+  public async listTortillas(): Promise<ITacoContent[]> {
+    const tortillas = await this.prisma.tortilla.findMany();
+    return tortillas.map((t) => ({
+      id: t.id,
+      nombre: t.nombre,
+      precio: t.precio,
+    }));
   }
 
-  public async crearTortilla(tortillaData: ITacoContent): Promise<ITacoContent> {
+  public async createTortilla(tortillaData: Partial<ITacoContent>): Promise<ITacoContent> {
     try {
       if (!tortillaData.nombre || tortillaData.precio === undefined) {
         throw new Error("Nombre y precio son requeridos para crear una tortilla");
       }
 
-      const tortillaId = Utils.generarUUID();
       const tortillaCreada = await this.prisma.tortilla.create({
         data: {
-          id: tortillaId,
           nombre: tortillaData.nombre,
           precio: tortillaData.precio,
         },
@@ -39,15 +41,14 @@ export class TacoContentController {
     }
   }
 
-  public async updateTortilla(id: string, tortillaData: ITacoContent): Promise<ITacoContent> {
+  public async replaceTortilla(id: number, tortillaData: ITacoContent): Promise<ITacoContent> {
     try {
-      // Validar que los datos necesarios estén presentes
       if (!tortillaData.nombre || tortillaData.precio === undefined) {
         throw new Error(
           "Nombre y precio son requeridos para actualizar una tortilla"
         );
       }
-      // Actualizar la tortilla en la base de datos
+
       const tortillaActualizada = await this.prisma.tortilla.update({
         where: { id },
         data: {
@@ -67,11 +68,9 @@ export class TacoContentController {
     }
   }
 
-  public async deleteTortilla(id: string): Promise<void> {
-    const controller = new TacoContentController();
-
+  public async removeTortilla(id: number): Promise<void> {
     try {
-      await controller.prisma.tortilla.delete({
+      await this.prisma.tortilla.delete({
         where: { id },
       });
     } catch (error) {
@@ -80,46 +79,50 @@ export class TacoContentController {
     }
   }
 
-  //#region utils
-
-  public static async getCheapestTortilla(): Promise<ITacoContent | null> {
-    const controller = new TacoContentController();
-
+  public async getCheapestTortilla(): Promise<ITacoContent | null> {
     try {
-      const cheapestTortilla = await controller.prisma.tortilla.findFirst({
+      const cheapestTortilla = await this.prisma.tortilla.findFirst({
         orderBy: { precio: "asc" },
       });
-      return cheapestTortilla;
+      return cheapestTortilla
+        ? {
+            id: cheapestTortilla.id,
+            nombre: cheapestTortilla.nombre,
+            precio: cheapestTortilla.precio,
+          }
+        : null;
     } catch (error) {
       console.error("Error al obtener la tortilla más barata:", error);
-      throw new Error("Error al obtener la tortilla más barata en la base de datos: " + error);
+      throw new Error("Error al obtener la tortilla más barata: " + error);
     }
   }
 
-  public static async getExpensiveTortilla(): Promise<ITacoContent | null> {
-    const controller = new TacoContentController();
-
+  public async getMostExpensiveTortilla(): Promise<ITacoContent | null> {
     try {
-      const expensiveTortilla = await controller.prisma.tortilla.findFirst({
+      const expensiveTortilla = await this.prisma.tortilla.findFirst({
         orderBy: { precio: "desc" },
       });
-      return expensiveTortilla;
+      return expensiveTortilla
+        ? {
+            id: expensiveTortilla.id,
+            nombre: expensiveTortilla.nombre,
+            precio: expensiveTortilla.precio,
+          }
+        : null;
     } catch (error) {
       console.error("Error al obtener la tortilla más cara:", error);
-      throw new Error("Error al obtener la tortilla más cara en la base de datos: " + error);
+      throw new Error("Error al obtener la tortilla más cara: " + error);
     }
   }
 
-  public static async getAverageTortilla(): Promise<number> {
-    const controller = new TacoContentController();
-
+  public async getAverageTortillaPrice(): Promise<number> {
     try {
-      const tortillas = await controller.prisma.tortilla.findMany();
-      const total = tortillas.reduce((sum, tortilla) => sum + (tortilla.precio || 0), 0);
+      const tortillas = await this.prisma.tortilla.findMany();
+      const total = tortillas.reduce((sum, tortilla) => sum + tortilla.precio, 0);
       return tortillas.length > 0 ? total / tortillas.length : 0;
     } catch (error) {
       console.error("Error al obtener el precio promedio de las tortillas:", error);
-      throw new Error("Error al obtener el precio promedio de las tortillas en la base de datos: " + error);
+      throw new Error("Error al obtener el precio promedio de las tortillas: " + error);
     }
   }
 }

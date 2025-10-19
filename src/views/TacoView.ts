@@ -1,18 +1,18 @@
 import { TacoController } from "../controllers/TacoController";
 import { ITacoStats } from "../interfaces/i-taco";
-import { TacoContentController } from '../controllers/TacoContentController';
+
 export class TacoView {
-    tacoController = new TacoController();
-    tacoContentController = new TacoContentController();
+  tacoController = new TacoController();
 
-    public mostrarTacoMasEconomico(): Promise<ITacoStats | null> {
-        return this.tacoController.getCheapestTaco();
-    }
-    public mostrarTacoMasCostoso(): Promise<ITacoStats | null> {
-        return this.tacoController.getExpensiveTaco();
-    }
-    public mostrarValorPromedioDeUnTaco(): Promise<number> {
-        return this.tacoController.getAverageTacoPrice();
-    }
+  public getCheapestTaco(): Promise<ITacoStats | null> {
+    return this.tacoController.getCheapestTaco();
+  }
 
+  public getMostExpensiveTaco(): Promise<ITacoStats | null> {
+    return this.tacoController.getMostExpensiveTaco();
+  }
+
+  public getAverageTacoPrice(): Promise<number> {
+    return this.tacoController.getAverageTacoPrice();
+  }
 }

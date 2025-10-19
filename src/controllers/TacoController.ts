@@ -1,153 +1,100 @@
 import { PrismaClient } from "@prisma/client";
-import { ITaco, ITacoStats } from "../interfaces/i-taco";
-import { Alimento } from "../models/Alimento";
-import { Taco } from "../models/Taco";
-import { Tortilla } from "../models/Tortilla";
-import { IAlimento } from "../interfaces/i-alimento";
-import { Utils } from "../utils/utils";
-import { AlimentoController } from "./AlimentoController";
+import { ITacoStats } from "../interfaces/i-taco";
+import { IngredientController } from "./IngredientController";
 import { TacoContentController } from "./TacoContentController";
 
 export class TacoController {
   private readonly prisma: PrismaClient;
+  private readonly ingredientController: IngredientController;
+  private readonly tortillaController: TacoContentController;
 
   constructor() {
     this.prisma = new PrismaClient();
+    this.ingredientController = new IngredientController();
+    this.tortillaController = new TacoContentController();
   }
-
-  //#region UTILS
 
   public async getCheapestTaco(): Promise<ITacoStats | null> {
     try {
-      const cheapestSalsa = await AlimentoController.getCheapestSalsa();
-      const cheapestAlimentosDeTortilla =
-        await AlimentoController.getCheapestAlimentosDeTortilla();
-      const cheapestTortilla =
-        await TacoContentController.getCheapestTortilla();
+      const cheapestSauce = await this.ingredientController.getCheapestSauce();
+      const cheapestFilling = await this.ingredientController.getCheapestFilling();
+      const cheapestTortilla = await this.tortillaController.getCheapestTortilla();
 
-      if (!cheapestSalsa && !cheapestAlimentosDeTortilla && !cheapestTortilla)
+      if (!cheapestTortilla || !cheapestFilling) {
         return null;
+      }
 
       const valorTotal =
-        (cheapestTortilla?.precio || 0) +
-        (cheapestSalsa?.precio || 0) +
-        (cheapestAlimentosDeTortilla?.reduce(
-          (sum, alimento) => sum + (alimento.precio || 0),
-          0
-        ) || 0);
+        cheapestTortilla.precio +
+        (cheapestSauce?.precio || 0) +
+        cheapestFilling.precio;
 
       const cheapestTaco: ITacoStats = {
-        valor: valorTotal || null,
-        tipoTortilla: cheapestTortilla?.nombre || null,
-        salsa: cheapestSalsa?.nombre || null,
-        alimentos:
-          cheapestAlimentosDeTortilla?.map((alimento) => alimento.nombre) ||
-          null,
+        value: valorTotal,
+        tortillaType: cheapestTortilla.nombre,
+        sauce: cheapestSauce?.nombre || null,
+        fillings: [cheapestFilling.nombre],
       };
 
       return cheapestTaco;
     } catch (error) {
       console.error("Error al obtener el taco más barato:", error);
-      throw new Error(
-        "Error al obtener el taco más barato en la base de datos: " + error
-      );
+      throw new Error("Error al obtener el taco más barato: " + error);
     }
   }
 
-  public async getExpensiveTaco(): Promise<ITacoStats | null> {
+  public async getMostExpensiveTaco(): Promise<ITacoStats | null> {
     try {
-      const expensiveSalsa = await AlimentoController.getExpensiveSalsa();
-      const expensiveAlimentosDeTortilla =
-        await AlimentoController.getExpensiveAlimentosDeTortilla();
-      const expensiveTortilla =
-        await TacoContentController.getExpensiveTortilla();
+      const expensiveSauce = await this.ingredientController.getMostExpensiveSauce();
+      const expensiveFilling = await this.ingredientController.getMostExpensiveFilling();
+      const expensiveTortilla = await this.tortillaController.getMostExpensiveTortilla();
 
-      if (!expensiveSalsa && !expensiveAlimentosDeTortilla && !expensiveTortilla)
+      if (!expensiveTortilla || !expensiveFilling) {
         return null;
+      }
+
+      // Un taco puede tener hasta 5 rellenos
+      const allFillings = await this.ingredientController.getFillings();
+      const top5Fillings = allFillings
+        .sort((a, b) => b.precio - a.precio)
+        .slice(0, 5);
 
       const valorTotal =
-        (expensiveTortilla?.precio || 0) +
-        (expensiveSalsa?.precio || 0) +
-        (expensiveAlimentosDeTortilla?.reduce(
-          (sum, alimento) => sum + (alimento.precio || 0),
-          0
-        ) || 0);
+        expensiveTortilla.precio +
+        (expensiveSauce?.precio || 0) +
+        top5Fillings.reduce((sum, f) => sum + f.precio, 0);
 
       const expensiveTaco: ITacoStats = {
-        valor: valorTotal || null,
-        tipoTortilla: expensiveTortilla?.nombre || null,
-        salsa: expensiveSalsa?.nombre || null,
-        alimentos:
-          expensiveAlimentosDeTortilla?.map((alimento) => alimento.nombre) ||
-          null,
+        value: valorTotal,
+        tortillaType: expensiveTortilla.nombre,
+        sauce: expensiveSauce?.nombre || null,
+        fillings: top5Fillings.map((f) => f.nombre),
       };
 
       return expensiveTaco;
     } catch (error) {
       console.error("Error al obtener el taco más costoso:", error);
-      throw new Error(
-        "Error al obtener el taco más costoso en la base de datos: " + error
-      );
+      throw new Error("Error al obtener el taco más costoso: " + error);
     }
   }
-
 
   public async getAverageTacoPrice(): Promise<number> {
-    const averageSalsaPrice = await AlimentoController.getAverageSalsaPrice();
-    const averageAlimentosDeTortilla =
-      await AlimentoController.getAverageAlimentosDeTortilla();
-    const averageTortilla = await TacoContentController.getAverageTortilla();
+    try {
+      const averageSaucePrice = await this.ingredientController.getAverageSaucePrice();
+      const averageFillingPrice = await this.ingredientController.getAverageFillingPrice();
+      const averageTortillaPrice = await this.tortillaController.getAverageTortillaPrice();
 
-    const total = (averageSalsaPrice || 0) + (averageAlimentosDeTortilla || 0) + (averageTortilla || 0);
-    const count = [averageSalsaPrice, averageAlimentosDeTortilla, averageTortilla].filter(Boolean).length;
+      // Asumimos un taco promedio con 1 tortilla, 2.5 rellenos (promedio entre 1 y 5)
+      // y 50% de probabilidad de tener salsa
+      const averageTacoPrice =
+        averageTortillaPrice +
+        averageFillingPrice * 2.5 +
+        averageSaucePrice * 0.5;
 
-    return count > 0 ? total / count : 0;
-  }
-
-  private mapToTacoModel(tacoDb: any): ITaco {
-    const tortilla = new Tortilla(
-      tacoDb.tortilla.nombre,
-      tacoDb.tortilla.precio,
-      tacoDb.tortilla.tipoTortilla
-    );
-    // Asignar ID a la tortilla
-    tortilla.id = tacoDb.tortilla.id;
-
-    let salsa = undefined;
-    if (tacoDb.salsa) {
-      salsa = new Alimento(
-        tacoDb.salsa.nombre,
-        tacoDb.salsa.tipoAlimento,
-        tacoDb.salsa.precio
-      );
-      // Asignar ID a la salsa
-      salsa.id = tacoDb.salsa.id;
+      return averageTacoPrice;
+    } catch (error) {
+      console.error("Error al calcular el precio promedio del taco:", error);
+      throw new Error("Error al calcular el precio promedio del taco: " + error);
     }
-
-    const alimentos: IAlimento[] = tacoDb.alimentos
-      ? tacoDb.alimentos.map((rel: any) => {
-          const alimento = new Alimento(
-            rel.alimento.nombre,
-            rel.alimento.tipoAlimento,
-            rel.alimento.precio
-          );
-          // Asignar ID al alimento
-          alimento.id = rel.alimento.id;
-          return alimento;
-        })
-      : [];
-
-    const taco = new Taco(tortilla, salsa, alimentos);
-    return taco;
-  }
-
-  private getPrecioCosto(taco: ITaco): number {
-    const precioTortilla = taco.tortilla.precio;
-    const precioSalsa = taco.salsa ? taco.salsa.precio : 0;
-    const precioAlimentos = taco.alimentos.reduce(
-      (sum, alimento) => sum + alimento.precio,
-      0
-    );
-    return precioTortilla + precioSalsa + precioAlimentos;
   }
 }

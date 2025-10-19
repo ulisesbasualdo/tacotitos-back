@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { TacoView } from './views/TacoView';
-import { AlimentoView } from './views/AlimentoView';
+import { IngredientView } from './views/AlimentoView';
 import { TacoContentView } from './views/TacoContentView';
 
 const app = express();
@@ -16,13 +16,13 @@ app.use(cors({
 app.use(express.json());
 
 const tacoView = new TacoView();
-const alimentoView= new AlimentoView();
+const ingredientView = new IngredientView();
 const tacoContentView = new TacoContentView();
 
 //#region Tortillas
 app.get('/tacos/tortillas', async (req: Request, res: Response) => {
   try {
-    const tortillas = await tacoContentView.getTiposTortilla();
+    const tortillas = await tacoContentView.listTortillas();
     res.json(tortillas);
   } catch (error) {
     console.error('Error en GET /tacos/tortillas:', error);
@@ -34,7 +34,7 @@ app.post('/tacos/tortillas', async (req: Request, res: Response) => {
   try {
     const tortillaCreada = await tacoContentView.addTortilla(req.body);
     res.status(201).json(tortillaCreada);
-    console.info('tortilla Creada', {tortillaCreada})
+    console.info('Tortilla creada', { tortillaCreada });
   } catch (error) {
     console.error('Error en POST /tacos/tortillas:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
@@ -43,10 +43,10 @@ app.post('/tacos/tortillas', async (req: Request, res: Response) => {
 
 app.put('/tacos/tortillas/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Number.parseInt(req.params.id, 10);
     const tortillaActualizada = await tacoContentView.updateTortilla(id, req.body);
     res.json(tortillaActualizada);
-    console.info('Tortilla actualizada datos nuevos: ', { id, ...tortillaActualizada });
+    console.info('Tortilla actualizada:', { id, ...tortillaActualizada });
   } catch (error) {
     console.error('Error en PUT /tacos/tortillas/:id:', error);
     res.status(500).json({ error: 'Error al actualizar tortilla' });
@@ -55,7 +55,7 @@ app.put('/tacos/tortillas/:id', async (req: Request, res: Response) => {
 
 app.delete('/tacos/tortillas/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Number.parseInt(req.params.id, 10);
     await tacoContentView.deleteTortilla(id);
     res.status(204).send();
     console.info('Tortilla eliminada con ID:', id);
@@ -65,130 +65,134 @@ app.delete('/tacos/tortillas/:id', async (req: Request, res: Response) => {
   }
 });
 
-//#region Alimentos
-app.get('/tacos/alimentos', async (req: Request, res: Response) => {
+//#region Fillings (Rellenos)
+app.get('/tacos/fillings', async (req: Request, res: Response) => {
   try {
-    const alimentos = await alimentoView.getAlimentosTortilla();
-    res.json(alimentos);
+    const fillings = await ingredientView.getFillings();
+    res.json(fillings);
   } catch (error) {
-    console.error('Error en GET /tacos/alimentos:', error);
-    res.status(500).json({ error: 'Error al obtener alimentos' });
+    console.error('Error en GET /tacos/fillings:', error);
+    res.status(500).json({ error: 'Error al obtener rellenos' });
   }
 });
 
-app.post('/tacos/alimentos', async (req: Request, res: Response) => {
+app.post('/tacos/fillings', async (req: Request, res: Response) => {
   try {
-    const alimentoCreado = await alimentoView.addAlimento(req.body);
-    res.status(201).json(alimentoCreado);
-    console.info('Alimento creado', { alimentoCreado });
+    const fillingCreado = await ingredientView.addFilling(req.body);
+    res.status(201).json(fillingCreado);
+    console.info('Relleno creado', { fillingCreado });
   } catch (error) {
-    console.error('Error en POST /tacos/alimentos:', error);
-    res.status(500).json({ error: 'Error al crear alimento' });
+    console.error('Error en POST /tacos/fillings:', error);
+    res.status(500).json({ error: 'Error al crear relleno' });
   }
 });
 
-app.put('/tacos/alimentos/:id', async (req: Request, res: Response) => {
+app.put('/tacos/fillings/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const alimentoActualizado = await alimentoView.updateAlimento(id, req.body);
-    res.json(alimentoActualizado);
-    console.info('Alimento actualizado datos nuevos: ', { id, ...alimentoActualizado });
+    const id = Number.parseInt(req.params.id, 10);
+    const fillingActualizado = await ingredientView.updateFilling(id, req.body);
+    res.json(fillingActualizado);
+    console.info('Relleno actualizado:', { id, ...fillingActualizado });
   } catch (error) {
-    console.error('Error en PUT /tacos/alimentos/:id:', error);
-    res.status(500).json({ error: 'Error al actualizar alimento' });
+    console.error('Error en PUT /tacos/fillings/:id:', error);
+    res.status(500).json({ error: 'Error al actualizar relleno' });
   }
 });
 
-app.delete('/tacos/alimentos/:id', async (req: Request, res: Response) => {
+app.delete('/tacos/fillings/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    await alimentoView.deleteAlimento(id);
+    const id = Number.parseInt(req.params.id, 10);
+    await ingredientView.deleteFilling(id);
     res.status(204).send();
-    console.info('Alimento eliminado con ID:', id);
+    console.info('Relleno eliminado con ID:', id);
   } catch (error) {
-    console.error('Error en DELETE /tacos/alimentos/:id:', error);
-    res.status(500).json({ error: 'Error al eliminar alimento' });
+    console.error('Error en DELETE /tacos/fillings/:id:', error);
+    res.status(500).json({ error: 'Error al eliminar relleno' });
   }
 });
 
-//#region Salsas
-app.get('/tacos/salsas', async (req: Request, res: Response) => {
+//#region Sauces (Salsas)
+app.get('/tacos/sauces', async (req: Request, res: Response) => {
   try {
-    
-    const salsas = await alimentoView.getSalsas();
-    res.json(salsas);
+    const sauces = await ingredientView.getSauces();
+    res.json(sauces);
   } catch (error) {
-    console.error('Error en GET /tacos/salsas:', error);
+    console.error('Error en GET /tacos/sauces:', error);
     res.status(500).json({ error: 'Error al obtener salsas' });
   }
 });
 
-app.post('/tacos/salsas', async (req: Request, res: Response) => {
+app.post('/tacos/sauces', async (req: Request, res: Response) => {
   try {
-    const salsaData = { ...req.body, tipoAlimento: 'salsa' };
-    const salsaCreada = await alimentoView.addAlimento(salsaData);
-    res.status(201).json(salsaCreada);
-    console.info('Salsa creada', { salsaCreada });
+    const sauceCreada = await ingredientView.addSauce(req.body);
+    res.status(201).json(sauceCreada);
+    console.info('Salsa creada', { sauceCreada });
   } catch (error) {
-    console.error('Error en POST /tacos/salsas:', error);
+    console.error('Error en POST /tacos/sauces:', error);
     res.status(500).json({ error: 'Error al crear salsa' });
   }
 });
 
-app.put('/tacos/salsas/:id', async (req: Request, res: Response) => {
+app.put('/tacos/sauces/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const salsaData = { ...req.body, tipoAlimento: 'salsa' };
-    const salsaActualizada = await alimentoView.updateAlimento(id, salsaData);
-    res.json(salsaActualizada);
-    console.info('Salsa actualizada datos nuevos: ', { id, ...salsaActualizada });
+    const id = Number.parseInt(req.params.id, 10);
+    const sauceActualizada = await ingredientView.updateSauce(id, req.body);
+    res.json(sauceActualizada);
+    console.info('Salsa actualizada:', { id, ...sauceActualizada });
   } catch (error) {
-    console.error('Error en PUT /tacos/salsas/:id:', error);
+    console.error('Error en PUT /tacos/sauces/:id:', error);
     res.status(500).json({ error: 'Error al actualizar salsa' });
   }
 });
 
-app.delete('/tacos/salsas/:id', async (req: Request, res: Response) => {
+app.delete('/tacos/sauces/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    await alimentoView.deleteAlimento(id);
+    const id = Number.parseInt(req.params.id, 10);
+    await ingredientView.deleteSauce(id);
     res.status(204).send();
     console.info('Salsa eliminada con ID:', id);
   } catch (error) {
-    console.error('Error en DELETE /tacos/salsas/:id:', error);
+    console.error('Error en DELETE /tacos/sauces/:id:', error);
     res.status(500).json({ error: 'Error al eliminar salsa' });
   }
 });
 
 //#region Estadísticas
-app.get('/tacos/stats/cheapest', async (req: Request, res: Response) => {
+app.get('/tacos/stats/cheapest', async (req: Request, res: Response): Promise<void> => {
   try {
-    const taco = await tacoView.mostrarTacoMasEconomico();
+    const taco = await tacoView.getCheapestTaco();
     if (!taco) {
       res.status(404).json({ error: 'No se encontró el taco más económico' });
+      return;
     }
     res.json(taco);
   } catch (error) {
     console.error('Error en GET /tacos/stats/cheapest:', error);
-    res.status(500).json({ error: 'Error al obtener taco más económico, error: ' + error });
+    res.status(500).json({ error: 'Error al obtener taco más económico: ' + error });
   }
 });
 
-app.get('/tacos/stats/most-expensive', async (req: Request, res: Response) => {
+app.get('/tacos/stats/most-expensive', async (req: Request, res: Response): Promise<void> => {
   try {
-    const taco = await tacoView.mostrarTacoMasCostoso();
+    const taco = await tacoView.getMostExpensiveTaco();
+    if (!taco) {
+      res.status(404).json({ error: 'No se encontró el taco más costoso' });
+      return;
+    }
     res.json(taco);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener taco más costoso, error: ' + error });
+    console.error('Error en GET /tacos/stats/most-expensive:', error);
+    res.status(500).json({ error: 'Error al obtener taco más costoso: ' + error });
   }
 });
 
-app.get('/tacos/stats/average-price', async (req: Request, res: Response) => {
+app.get('/tacos/stats/average-price', async (req: Request, res: Response): Promise<void> => {
   try {
-    const promedio = await tacoView.mostrarValorPromedioDeUnTaco();
-    res.json(promedio);
+    const promedio = await tacoView.getAverageTacoPrice();
+    res.json({ averagePrice: promedio });
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener valor promedio, error: ' + error });
+    console.error('Error en GET /tacos/stats/average-price:', error);
+    res.status(500).json({ error: 'Error al obtener valor promedio: ' + error });
   }
 });
 

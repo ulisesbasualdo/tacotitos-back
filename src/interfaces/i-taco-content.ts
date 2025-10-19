@@ -1,5 +1,5 @@
 export interface ITacoContent {
-    id?: string;
+    id?: number;
     nombre: string;
     precio: number;
 }

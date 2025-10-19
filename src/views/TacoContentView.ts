@@ -2,15 +2,15 @@ import { TacoContentController } from "../controllers/TacoContentController";
 import { ITacoContent } from "../interfaces/i-taco-content";
 
 export class TacoContentView {
-  tacoContentControler = new TacoContentController();
+  tacoContentController = new TacoContentController();
 
-  public getTiposTortilla(): Promise<ITacoContent[]> {
-    return this.tacoContentControler.getTortillas();
+  public listTortillas(): Promise<ITacoContent[]> {
+    return this.tacoContentController.listTortillas();
   }
 
-  public async addTortilla(tortilla: ITacoContent): Promise<ITacoContent> {
+  public async addTortilla(tortilla: Partial<ITacoContent>): Promise<ITacoContent> {
     try {
-      return await this.tacoContentControler.crearTortilla(tortilla);
+      return await this.tacoContentController.createTortilla(tortilla);
     } catch (error) {
       console.error("Error en TacoContentView.addTortilla: ", error);
       throw error;
@@ -18,20 +18,20 @@ export class TacoContentView {
   }
 
   public async updateTortilla(
-    id: string,
+    id: number,
     tortillaData: ITacoContent
   ): Promise<ITacoContent> {
     try {
-      return await this.tacoContentControler.updateTortilla(id, tortillaData);
+      return await this.tacoContentController.replaceTortilla(id, tortillaData);
     } catch (error) {
       console.error("Error en TacoContentView.updateTortilla: ", error);
       throw error;
     }
   }
 
-  public async deleteTortilla(id: string): Promise<void> {
+  public async deleteTortilla(id: number): Promise<void> {
     try {
-      return await this.tacoContentControler.deleteTortilla(id);
+      return await this.tacoContentController.removeTortilla(id);
     } catch (error) {
       console.error("Error en TacoContentView.deleteTortilla: ", error);
       throw error;

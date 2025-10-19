@@ -1,16 +1,16 @@
-import { IAlimento } from "./i-alimento";
+import { IFilling, ISauce } from "./i-alimento";
 import { ITacoContent } from "./i-taco-content";
 
 export interface ITaco {
-    id?: string;
-    tortilla: ITacoContent
-    salsa?: IAlimento;
-    alimentos: IAlimento[];
+    id?: number;
+    tortilla: ITacoContent;
+    sauce?: ISauce;
+    fillings: IFilling[];
 }
 
 export interface ITacoStats {
-    valor: number | null;
-    tipoTortilla: string | null;
-    salsa: string | null;
-    alimentos: string[] | null;
+    value: number | null;
+    tortillaType: string | null;
+    sauce: string | null;
+    fillings: string[] | null;
 }

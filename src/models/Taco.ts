@@ -1,21 +1,24 @@
-import { IAlimento } from "../interfaces/i-alimento";
+import { IFilling, ISauce } from "../interfaces/i-alimento";
 import { ITaco } from "../interfaces/i-taco";
 import { ITacoContent } from "../interfaces/i-taco-content";
 
 export class Taco implements ITaco {
-  private _salsa?: IAlimento;
-  get salsa(): IAlimento {
-    if (this._salsa) {
-      return this._salsa;
-    }
-    throw new Error("Salsa no está disponible");
+  private _id?: number;
+  get id(): number | undefined {
+    return this._id;
   }
-  set salsa(value: IAlimento | undefined) {
-    if (value && value.tipoAlimento !== "salsa") {
-      throw new Error("El alimento proporcionado no es una salsa");
-    }
-    this._salsa = value;
+  set id(value: number | undefined) {
+    this._id = value;
   }
+
+  private _sauce?: ISauce;
+  get sauce(): ISauce | undefined {
+    return this._sauce;
+  }
+  set sauce(value: ISauce | undefined) {
+    this._sauce = value;
+  }
+
   private _tortilla: ITacoContent;
   get tortilla(): ITacoContent {
     return this._tortilla;
@@ -23,66 +26,75 @@ export class Taco implements ITaco {
   set tortilla(value: ITacoContent) {
     this._tortilla = value;
   }
-  private _alimentos: IAlimento[] = [];
-  get alimentos(): IAlimento[] {
-    return this._alimentos;
+
+  private _fillings: IFilling[] = [];
+  get fillings(): IFilling[] {
+    return this._fillings;
   }
-  set alimentos(value: IAlimento[]) {
-    this._alimentos = value;
+  set fillings(value: IFilling[]) {
+    if (value.length < 1 || value.length > 5) {
+      throw new Error("Un taco debe tener entre 1 y 5 rellenos");
+    }
+    this._fillings = value;
   }
 
   constructor(
     tortilla: ITacoContent,
-    salsa?: IAlimento,
-    alimentos: IAlimento[] = []
+    fillings: IFilling[] = [],
+    sauce?: ISauce,
+    id?: number
   ) {
-    this._salsa = salsa;
+    if (fillings.length < 1 || fillings.length > 5) {
+      throw new Error("Un taco debe tener entre 1 y 5 rellenos");
+    }
+    this._id = id;
     this._tortilla = tortilla;
-    this._alimentos = alimentos;
+    this._fillings = fillings;
+    this._sauce = sauce;
   }
 
   getPrecioCosto(): number {
     let costo = this._tortilla.precio;
 
-    if (this._salsa) {
-      costo += this._salsa.precio;
+    if (this._sauce) {
+      costo += this._sauce.precio;
     }
-    // Sumar el costo de todos los alimentos
-    if (this._alimentos.length > 0) {
-      costo += this._alimentos.reduce(
-        (sum, alimento) => sum + alimento.precio,
+
+    if (this._fillings.length > 0) {
+      costo += this._fillings.reduce(
+        (sum, filling) => sum + filling.precio,
         0
       );
     }
 
     return costo;
   }
+
   getPrecioVenta(): number {
     return this.getPrecioCosto() * 1.5;
   }
 
   toJSON() {
     const result: any = {
+      id: this._id,
       tortilla: {
         id: this._tortilla.id,
         nombre: this._tortilla.nombre,
         precio: this._tortilla.precio,
       },
-      alimentos: this._alimentos.map((alimento) => ({
-        id: alimento.id,
-        nombre: alimento.nombre,
-        precio: alimento.precio,
-        tipoAlimento: alimento.tipoAlimento,
+      fillings: this._fillings.map((filling) => ({
+        id: filling.id,
+        nombre: filling.nombre,
+        precio: filling.precio,
       })),
-      precio: this.getPrecioCosto(), // Añadir precio total
+      precio: this.getPrecioCosto(),
     };
 
-    if (this._salsa) {
-      result.salsa = {
-        id: this._salsa.id,
-        nombre: this._salsa.nombre,
-        precio: this._salsa.precio,
-        tipoAlimento: this._salsa.tipoAlimento,
+    if (this._sauce) {
+      result.sauce = {
+        id: this._sauce.id,
+        nombre: this._sauce.nombre,
+        precio: this._sauce.precio,
       };
     }
 

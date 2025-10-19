@@ -1,32 +1,40 @@
-import { AlimentoController } from "../controllers/AlimentoController";
-import { IAlimento } from "../interfaces/i-alimento";
+import { IngredientController } from "../controllers/IngredientController";
+import { IFilling, ISauce } from "../interfaces/i-alimento";
 
-export class AlimentoView {
-  alimentoController = new AlimentoController();
+export class IngredientView {
+  ingredientController = new IngredientController();
 
-  public getAlimentosTortilla(): Promise<IAlimento[]> {
-    return this.alimentoController.getAlimentosTortilla();
+  // Fillings
+  public getFillings(): Promise<IFilling[]> {
+    return this.ingredientController.getFillings();
   }
 
-  public getSalsas(): Promise<IAlimento[]> {
-    return this.alimentoController.getSalsas();
+  public addFilling(filling: Partial<IFilling>): Promise<IFilling> {
+    return this.ingredientController.createFilling(filling);
   }
 
-  public addAlimento(alimento:IAlimento): Promise<IAlimento> {
-    return this.alimentoController.addAlimento(alimento);
+  public updateFilling(id: number, data: IFilling): Promise<IFilling> {
+    return this.ingredientController.replaceFilling(id, data);
   }
 
-  public updateAlimento(id:string, data:IAlimento): Promise<IAlimento>{
-    return this.alimentoController.updateAlimento(id,data);
+  public deleteFilling(id: number): Promise<void> {
+    return this.ingredientController.removeFilling(id);
   }
 
-  public deleteAlimento(id:string): Promise<void>{
-    return this.alimentoController.deleteAlimento(id);
+  // Sauces
+  public getSauces(): Promise<ISauce[]> {
+    return this.ingredientController.getSauces();
   }
 
+  public addSauce(sauce: Partial<ISauce>): Promise<ISauce> {
+    return this.ingredientController.createSauce(sauce);
+  }
 
+  public updateSauce(id: number, data: ISauce): Promise<ISauce> {
+    return this.ingredientController.replaceSauce(id, data);
+  }
 
-
-
-
+  public deleteSauce(id: number): Promise<void> {
+    return this.ingredientController.removeSauce(id);
+  }
 }

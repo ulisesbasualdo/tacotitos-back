@@ -7,59 +7,68 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Alimento {
-  id           String   @id @default(uuid())
+model Tortilla {
+  id           Int      @id @default(autoincrement())
   nombre       String
-  tipoAlimento String   // 'alimentoTortilla' | 'salsa'
   precio       Float
+  tipoTortilla String   @default("single") // 'single' | 'double'
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   
   // Relaciones
-  tacosComoSalsa Taco[] @relation("TacoSalsa")
-  tacosContenido TacoAlimentos[]
-  @@map("alimentos")
+  tacos        Taco[]
+  @@map("tortillas")
 }
 
-model Tortilla {
-  id        String   @id @default(uuid())
+model Filling {
+  id        Int      @id @default(autoincrement())
   nombre    String
   precio    Float
-  tipoTortilla String @default("simple")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relaciones
+  tacoFillings TacoFilling[]
+  @@map("fillings")
+}
+
+model Sauce {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  precio    Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
   // Relaciones
   tacos     Taco[]
-  @@map("tortillas")
+  @@map("sauces")
 }
 
 model Taco {
-  id         String   @id @default(uuid())
-  tortillaId String
-  salsaId    String?  // Opcional porque la salsa puede ser null
+  id         Int      @id @default(autoincrement())
+  tortillaId Int
+  sauceId    Int?     // Opcional porque la salsa puede ser null
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   
   // Relaciones
   tortilla   Tortilla @relation(fields: [tortillaId], references: [id])
-  salsa      Alimento? @relation("TacoSalsa", fields: [salsaId], references: [id])
-  alimentos  TacoAlimentos[]
-
+  sauce      Sauce?   @relation(fields: [sauceId], references: [id])
+  fillings   TacoFilling[]
 
   @@map("tacos")
 }
 
-model TacoAlimentos {
-  id          String       @id @default(uuid())
-  tacoId      String
-  alimentoId  String
-  createdAt   DateTime @default(now())
+model TacoFilling {
+  id        Int      @id @default(autoincrement())
+  tacoId    Int
+  fillingId Int
+  createdAt DateTime @default(now())
   
   // Relaciones
-  taco        Taco     @relation(fields: [tacoId], references: [id])
-  alimento    Alimento @relation(fields: [alimentoId], references: [id])
+  taco      Taco     @relation(fields: [tacoId], references: [id], onDelete: Cascade)
+  filling   Filling  @relation(fields: [fillingId], references: [id])
   
-  @@unique([tacoId, alimentoId])
-  @@map("taco_alimentos")
+  @@unique([tacoId, fillingId])
+  @@map("taco_fillings")
 }

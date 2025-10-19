@@ -1,7 +1,5 @@
 import { ITacoContent } from "./i-taco-content";
 
-export type TTipoAlimento = 'alimentoTortilla' | 'salsa';
+export interface IFilling extends ITacoContent {}
 
-export interface IAlimento extends ITacoContent {
-    tipoAlimento: TTipoAlimento
-}
+export interface ISauce extends ITacoContent {}

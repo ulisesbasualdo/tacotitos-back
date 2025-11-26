@@ -1,4 +1,4 @@
-import { IngredientController } from "../controllers/IngredientController";
+import { IngredientController } from "../controllers/ingredient-controller";
 import { TacoContent } from "../interfaces/taco-content";
 
 export class IngredientView {

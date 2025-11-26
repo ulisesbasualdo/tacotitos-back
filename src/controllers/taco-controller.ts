@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { TacoStats } from "../interfaces/taco-stats";
-import { IngredientController } from "./IngredientController";
-import { TacoContentController } from "./TacoContentController";
+import { IngredientController } from "./ingredient-controller";
+import { TacoContentController } from "./taco-content-controller";
 
 export class TacoController {
   private readonly prisma: PrismaClient;

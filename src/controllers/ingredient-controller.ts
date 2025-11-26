@@ -1,7 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { Filling } from "../models/Filling";
 import { TacoContent } from "../interfaces/taco-content";
-import { Sauce } from "../models/Sauce";
 
 export class IngredientController {
   private readonly prisma: PrismaClient;
@@ -13,41 +11,39 @@ export class IngredientController {
   // Fillings
   public async getFillings(): Promise<TacoContent[]> {
     const fillings = await this.prisma.filling.findMany();
-    return fillings.map((filling) => ({
-      id: filling.id,
-      name: filling.name,
-      price: filling.price,
+    return fillings.map((filling: TacoContent) => ({
+      filling: filling,
     }));
   }
 
-  public async createFilling(fillingData: Partial<TacoContent>): Promise<TacoContent> {
+  public async createFilling(
+    fillingData: Partial<TacoContent>
+  ): Promise<TacoContent> {
     try {
       if (!fillingData.name || fillingData.price === undefined) {
         throw new Error("Nombre y precio son requeridos para crear un relleno");
       }
-
       const fillingCreado = await this.prisma.filling.create({
         data: {
           name: fillingData.name,
           price: fillingData.price,
         },
       });
-
-      return new Filling(
-        fillingCreado.name,
-        fillingCreado.price,
-        fillingCreado.id
-      );
+      return fillingCreado;
     } catch (error) {
-      console.error("Error al crear el relleno:", error);
       throw new Error("Error al crear relleno en la base de datos: " + error);
     }
   }
 
-  public async replaceFilling(id: number, fillingData: TacoContent): Promise<TacoContent> {
+  public async replaceFilling(
+    id: number,
+    fillingData: TacoContent
+  ): Promise<TacoContent> {
     try {
       if (!fillingData.name || fillingData.price === undefined) {
-        throw new Error("Nombre y precio son requeridos para actualizar un relleno");
+        throw new Error(
+          "Nombre y precio son requeridos para actualizar un relleno"
+        );
       }
 
       const fillingActualizado = await this.prisma.filling.update({
@@ -58,14 +54,11 @@ export class IngredientController {
         },
       });
 
-      return new Filling(
-        fillingActualizado.name,
-        fillingActualizado.price,
-        fillingActualizado.id
-      );
+      return fillingActualizado;
     } catch (error) {
-      console.error("Error al actualizar relleno:", error);
-      throw new Error("Error al actualizar relleno en la base de datos: " + error);
+      throw new Error(
+        "Error al actualizar relleno en la base de datos: " + error
+      );
     }
   }
 
@@ -75,23 +68,23 @@ export class IngredientController {
         where: { id },
       });
     } catch (error) {
-      console.error("Error al eliminar relleno:", error);
-      throw new Error("Error al eliminar relleno en la base de datos: " + error);
+      throw new Error(
+        "Error al eliminar relleno en la base de datos: " + error
+      );
     }
   }
 
   // Sauces
   public async getSauces(): Promise<TacoContent[]> {
     const sauces = await this.prisma.sauce.findMany();
-    return sauces.map((sauce) => ({
-      id: sauce.id,
-      name: sauce.name,
-      price: sauce.price,
+    return sauces.map((sauce: TacoContent) => ({
+      sauce: sauce,
     }));
   }
 
-  public async createSauce(sauceData: Partial<TacoContent>): Promise<TacoContent> {
-
+  public async createSauce(
+    sauceData: Partial<TacoContent>
+  ): Promise<TacoContent> {
     try {
       if (!sauceData.name || sauceData.price === undefined) {
         throw new Error("Nombre y precio son requeridos para crear una salsa");
@@ -103,20 +96,21 @@ export class IngredientController {
         },
       });
 
-      return new Sauce(
-        sauceCreada.name,
-        sauceCreada.price,
-      );
+      return sauceCreada;
     } catch (error) {
-      console.error("Error al crear la salsa:", error);
       throw new Error("Error al crear salsa en la base de datos: " + error);
     }
   }
 
-  public async replaceSauce(id: number, sauceData: TacoContent): Promise<TacoContent> {
+  public async replaceSauce(
+    id: number,
+    sauceData: TacoContent
+  ): Promise<TacoContent> {
     try {
       if (!sauceData.name || sauceData.price === undefined) {
-        throw new Error("Nombre y precio son requeridos para actualizar una salsa");
+        throw new Error(
+          "Nombre y precio son requeridos para actualizar una salsa"
+        );
       }
 
       const sauceActualizada = await this.prisma.sauce.update({
@@ -127,13 +121,11 @@ export class IngredientController {
         },
       });
 
-      return new Sauce(
-        sauceActualizada.name,
-        sauceActualizada.price,
-      );
+      return sauceActualizada;
     } catch (error) {
-      console.error("Error al actualizar salsa:", error);
-      throw new Error("Error al actualizar salsa en la base de datos: " + error);
+      throw new Error(
+        "Error al actualizar salsa en la base de datos: " + error
+      );
     }
   }
 
@@ -143,7 +135,6 @@ export class IngredientController {
         where: { id },
       });
     } catch (error) {
-      console.error("Error al eliminar salsa:", error);
       throw new Error("Error al eliminar salsa en la base de datos: " + error);
     }
   }
@@ -154,11 +145,8 @@ export class IngredientController {
       const cheapestFilling = await this.prisma.filling.findFirst({
         orderBy: { price: "asc" },
       });
-      return cheapestFilling
-        ? new Filling(cheapestFilling.name, cheapestFilling.price, cheapestFilling.id)
-        : null;
+      return cheapestFilling ?? null;
     } catch (error) {
-      console.error("Error al obtener el relleno más barato:", error);
       throw new Error("Error al obtener el relleno más barato: " + error);
     }
   }
@@ -168,11 +156,8 @@ export class IngredientController {
       const expensiveFilling = await this.prisma.filling.findFirst({
         orderBy: { price: "desc" },
       });
-      return expensiveFilling
-        ? new Filling(expensiveFilling.name, expensiveFilling.price, expensiveFilling.id)
-        : null;
+      return expensiveFilling ?? null;
     } catch (error) {
-      console.error("Error al obtener el relleno más caro:", error);
       throw new Error("Error al obtener el relleno más caro: " + error);
     }
   }
@@ -180,11 +165,15 @@ export class IngredientController {
   public async getAverageFillingPrice(): Promise<number> {
     try {
       const fillings = await this.prisma.filling.findMany();
-      const total = fillings.reduce((sum, filling) => sum + filling.price, 0);
+      const total = fillings.reduce(
+        (sum: number, filling: TacoContent) => sum + filling.price,
+        0
+      );
       return fillings.length > 0 ? total / fillings.length : 0;
     } catch (error) {
-      console.error("Error al obtener el precio promedio de los rellenos:", error);
-      throw new Error("Error al obtener el precio promedio de los rellenos: " + error);
+      throw new Error(
+        "Error al obtener el precio promedio de los rellenos: " + error
+      );
     }
   }
 
@@ -194,11 +183,8 @@ export class IngredientController {
       const cheapestSauce = await this.prisma.sauce.findFirst({
         orderBy: { price: "asc" },
       });
-      return cheapestSauce
-        ? new Sauce(cheapestSauce.name, cheapestSauce.price)
-        : null;
+      return cheapestSauce ?? null;
     } catch (error) {
-      console.error("Error al obtener la salsa más barata:", error);
       throw new Error("Error al obtener la salsa más barata: " + error);
     }
   }
@@ -208,11 +194,8 @@ export class IngredientController {
       const expensiveSauce = await this.prisma.sauce.findFirst({
         orderBy: { price: "desc" },
       });
-      return expensiveSauce
-        ? new Sauce(expensiveSauce.name, expensiveSauce.price)
-        : null;
+      return expensiveSauce ?? null;
     } catch (error) {
-      console.error("Error al obtener la salsa más cara:", error);
       throw new Error("Error al obtener la salsa más cara: " + error);
     }
   }
@@ -220,11 +203,15 @@ export class IngredientController {
   public async getAverageSaucePrice(): Promise<number> {
     try {
       const sauces = await this.prisma.sauce.findMany();
-      const total = sauces.reduce((sum, sauce) => sum + sauce.price, 0);
+      const total = sauces.reduce(
+        (sum: number, sauce: TacoContent) => sum + sauce.price,
+        0
+      );
       return sauces.length > 0 ? total / sauces.length : 0;
     } catch (error) {
-      console.error("Error al obtener el precio promedio de las salsas:", error);
-      throw new Error("Error al obtener el precio promedio de las salsas: " + error);
+      throw new Error(
+        "Error al obtener el precio promedio de las salsas: " + error
+      );
     }
   }
 }

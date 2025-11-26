@@ -10,14 +10,16 @@ export class TacoContentController {
 
   public async listTortillas(): Promise<TacoContent[]> {
     const tortillas = await this.prisma.tortilla.findMany();
-    return tortillas.map((tortilla) => ({
+    return tortillas.map((tortilla: TacoContent) => ({
       id: tortilla.id,
       name: tortilla.name,
       price: tortilla.price,
     }));
   }
 
-  public async createTortilla(tortillaData: Partial<TacoContent>): Promise<TacoContent> {
+  public async createTortilla(
+    tortillaData: Partial<TacoContent>
+  ): Promise<TacoContent> {
     try {
       if (!tortillaData.name || tortillaData.price === undefined) {
         throw new Error("name y price son requeridos para crear una tortilla");
@@ -30,18 +32,16 @@ export class TacoContentController {
         },
       });
 
-      return {
-        id: tortillaCreada.id,
-        name: tortillaCreada.name,
-        price: tortillaCreada.price,
-      };
+      return tortillaCreada;
     } catch (error) {
-      console.error("Error al crear tortilla:", error);
       throw new Error("Error al crear tortilla en la base de datos: " + error);
     }
   }
 
-  public async replaceTortilla(id: number, tortillaData: TacoContent): Promise<TacoContent> {
+  public async replaceTortilla(
+    id: number,
+    tortillaData: TacoContent
+  ): Promise<TacoContent> {
     try {
       if (!tortillaData.name || tortillaData.price === undefined) {
         throw new Error(
@@ -57,14 +57,11 @@ export class TacoContentController {
         },
       });
 
-      return {
-        id: tortillaActualizada.id,
-        name: tortillaActualizada.name,
-        price: tortillaActualizada.price,
-      };
+      return tortillaActualizada;
     } catch (error) {
-      console.error("Error al actualizar tortilla:", error);
-      throw new Error("Error al actualizar tortilla en la base de datos: " + error);
+      throw new Error(
+        "Error al actualizar tortilla en la base de datos: " + error
+      );
     }
   }
 
@@ -74,8 +71,9 @@ export class TacoContentController {
         where: { id },
       });
     } catch (error) {
-      console.error("Error al eliminar tortilla:", error);
-      throw new Error("Error al eliminar tortilla en la base de datos: " + error);
+      throw new Error(
+        "Error al eliminar tortilla en la base de datos: " + error
+      );
     }
   }
 
@@ -84,15 +82,8 @@ export class TacoContentController {
       const cheapestTortilla = await this.prisma.tortilla.findFirst({
         orderBy: { price: "asc" },
       });
-      return cheapestTortilla
-        ? {
-            id: cheapestTortilla.id,
-            name: cheapestTortilla.name,
-            price: cheapestTortilla.price,
-          }
-        : null;
+      return cheapestTortilla ?? null;
     } catch (error) {
-      console.error("Error al obtener la tortilla más barata:", error);
       throw new Error("Error al obtener la tortilla más barata: " + error);
     }
   }
@@ -102,15 +93,8 @@ export class TacoContentController {
       const expensiveTortilla = await this.prisma.tortilla.findFirst({
         orderBy: { price: "desc" },
       });
-      return expensiveTortilla
-        ? {
-            id: expensiveTortilla.id,
-            name: expensiveTortilla.name,
-            price: expensiveTortilla.price,
-          }
-        : null;
+      return expensiveTortilla ?? null;
     } catch (error) {
-      console.error("Error al obtener la tortilla más cara:", error);
       throw new Error("Error al obtener la tortilla más cara: " + error);
     }
   }
@@ -118,11 +102,15 @@ export class TacoContentController {
   public async getAverageTortillaPrice(): Promise<number> {
     try {
       const tortillas = await this.prisma.tortilla.findMany();
-      const total = tortillas.reduce((sum, tortilla) => sum + tortilla.price, 0);
+      const total = tortillas.reduce(
+        (sum: number, tortilla: TacoContent) => sum + tortilla.price,
+        0
+      );
       return tortillas.length > 0 ? total / tortillas.length : 0;
     } catch (error) {
-      console.error("Error al obtener el price promedio de las tortillas:", error);
-      throw new Error("Error al obtener el price promedio de las tortillas: " + error);
+      throw new Error(
+        "Error al obtener el price promedio de las tortillas: " + error
+      );
     }
   }
 }

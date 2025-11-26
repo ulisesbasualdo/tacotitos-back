@@ -1,4 +1,4 @@
-import { TacoContentController } from "../controllers/TacoContentController";
+import { TacoContentController } from "../controllers/taco-content-controller";
 import { TacoContent } from "../interfaces/taco-content";
 
 export class TacoContentView {

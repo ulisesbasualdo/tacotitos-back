@@ -16,30 +16,26 @@ async function main() {
   const tortillas = await Promise.all([
     prisma.tortilla.create({
       data: {
-        nombre: 'Tortilla de Maíz Simple',
-        precio: 15.0,
-        tipoTortilla: 'single',
+        name: 'Tortilla de Maíz Simple',
+        price: 15,
       },
     }),
     prisma.tortilla.create({
       data: {
-        nombre: 'Tortilla de Maíz Doble',
-        precio: 25.0,
-        tipoTortilla: 'double',
+        name: 'Tortilla de Maíz Doble',
+        price: 25,
       },
     }),
     prisma.tortilla.create({
       data: {
-        nombre: 'Tortilla de Harina Simple',
-        precio: 18.0,
-        tipoTortilla: 'single',
+        name: 'Tortilla de Harina Simple',
+        price: 18,
       },
     }),
     prisma.tortilla.create({
       data: {
-        nombre: 'Tortilla de Harina Doble',
-        precio: 30.0,
-        tipoTortilla: 'double',
+        name: 'Tortilla de Harina Doble',
+        price: 30,
       },
     }),
   ]);
@@ -48,27 +44,27 @@ async function main() {
 
   // Create Fillings
   const fillings = await Promise.all([
-    prisma.filling.create({ data: { nombre: 'Carne Asada', precio: 35.0 } }),
-    prisma.filling.create({ data: { nombre: 'Pollo', precio: 30.0 } }),
-    prisma.filling.create({ data: { nombre: 'Pastor', precio: 32.0 } }),
-    prisma.filling.create({ data: { nombre: 'Carnitas', precio: 33.0 } }),
-    prisma.filling.create({ data: { nombre: 'Chorizo', precio: 28.0 } }),
-    prisma.filling.create({ data: { nombre: 'Pescado', precio: 40.0 } }),
-    prisma.filling.create({ data: { nombre: 'Camarón', precio: 45.0 } }),
-    prisma.filling.create({ data: { nombre: 'Vegetales', precio: 25.0 } }),
-    prisma.filling.create({ data: { nombre: 'Frijoles', precio: 20.0 } }),
-    prisma.filling.create({ data: { nombre: 'Queso', precio: 22.0 } }),
+    prisma.filling.create({ data: { name: 'Carne Asada', price: 35.0 } }),
+    prisma.filling.create({ data: { name: 'Pollo', price: 30.0 } }),
+    prisma.filling.create({ data: { name: 'Pastor', price: 32.0 } }),
+    prisma.filling.create({ data: { name: 'Carnitas', price: 33.0 } }),
+    prisma.filling.create({ data: { name: 'Chorizo', price: 28.0 } }),
+    prisma.filling.create({ data: { name: 'Pescado', price: 40.0 } }),
+    prisma.filling.create({ data: { name: 'Camarón', price: 45.0 } }),
+    prisma.filling.create({ data: { name: 'Vegetales', price: 25.0 } }),
+    prisma.filling.create({ data: { name: 'Frijoles', price: 20.0 } }),
+    prisma.filling.create({ data: { name: 'Queso', price: 22.0 } }),
   ]);
 
   console.log(`✅ Created ${fillings.length} fillings`);
 
   // Create Sauces
   const sauces = await Promise.all([
-    prisma.sauce.create({ data: { nombre: 'Salsa Roja', precio: 5.0 } }),
-    prisma.sauce.create({ data: { nombre: 'Salsa Verde', precio: 5.0 } }),
-    prisma.sauce.create({ data: { nombre: 'Salsa Habanera', precio: 8.0 } }),
-    prisma.sauce.create({ data: { nombre: 'Guacamole', precio: 15.0 } }),
-    prisma.sauce.create({ data: { nombre: 'Pico de Gallo', precio: 10.0 } }),
+    prisma.sauce.create({ data: { name: 'Salsa Roja', price: 5.0 } }),
+    prisma.sauce.create({ data: { name: 'Salsa Verde', price: 5.0 } }),
+    prisma.sauce.create({ data: { name: 'Salsa Habanera', price: 8.0 } }),
+    prisma.sauce.create({ data: { name: 'Guacamole', price: 15.0 } }),
+    prisma.sauce.create({ data: { name: 'Pico de Gallo', price: 10.0 } }),
   ]);
 
   console.log(`✅ Created ${sauces.length} sauces`);
@@ -84,6 +80,7 @@ async function main() {
           { fillingId: fillings[9].id },
         ],
       },
+      doubleTortilla: true,
     },
   });
 
@@ -98,8 +95,11 @@ async function main() {
           { fillingId: fillings[9].id },
         ],
       },
+      doubleTortilla: false,
     },
   });
+
+  
 
   console.log(`✅ Created 2 sample tacos`);
   console.log('🌮 Database seeded successfully!');

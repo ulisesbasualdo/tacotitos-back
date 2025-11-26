@@ -1,14 +1,14 @@
 import { TacoContentController } from "../controllers/TacoContentController";
-import { ITacoContent } from "../interfaces/i-taco-content";
+import { TacoContent } from "../interfaces/taco-content";
 
 export class TacoContentView {
   tacoContentController = new TacoContentController();
 
-  public listTortillas(): Promise<ITacoContent[]> {
+  public listTortillas(): Promise<TacoContent[]> {
     return this.tacoContentController.listTortillas();
   }
 
-  public async addTortilla(tortilla: Partial<ITacoContent>): Promise<ITacoContent> {
+  public async addTortilla(tortilla: Partial<TacoContent>): Promise<TacoContent> {
     try {
       return await this.tacoContentController.createTortilla(tortilla);
     } catch (error) {
@@ -19,8 +19,8 @@ export class TacoContentView {
 
   public async updateTortilla(
     id: number,
-    tortillaData: ITacoContent
-  ): Promise<ITacoContent> {
+    tortillaData: TacoContent
+  ): Promise<TacoContent> {
     try {
       return await this.tacoContentController.replaceTortilla(id, tortillaData);
     } catch (error) {

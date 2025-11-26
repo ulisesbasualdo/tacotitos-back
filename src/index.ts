@@ -46,8 +46,7 @@ app.put('/tacos/tortillas/:id', async (req: Request, res: Response) => {
     const id = Number.parseInt(req.params.id, 10);
     const tortillaActualizada = await tacoContentView.updateTortilla(id, req.body);
     res.json(tortillaActualizada);
-    console.info('Tortilla actualizada:', { id, ...tortillaActualizada });
-  } catch (error) {
+console.info('Tortilla actualizada:', tortillaActualizada);  } catch (error) {
     console.error('Error en PUT /tacos/tortillas/:id:', error);
     res.status(500).json({ error: 'Error al actualizar tortilla' });
   }
@@ -92,7 +91,7 @@ app.put('/tacos/fillings/:id', async (req: Request, res: Response) => {
     const id = Number.parseInt(req.params.id, 10);
     const fillingActualizado = await ingredientView.updateFilling(id, req.body);
     res.json(fillingActualizado);
-    console.info('Relleno actualizado:', { id, ...fillingActualizado });
+    console.info('Relleno actualizado:', fillingActualizado );
   } catch (error) {
     console.error('Error en PUT /tacos/fillings/:id:', error);
     res.status(500).json({ error: 'Error al actualizar relleno' });
@@ -138,7 +137,7 @@ app.put('/tacos/sauces/:id', async (req: Request, res: Response) => {
     const id = Number.parseInt(req.params.id, 10);
     const sauceActualizada = await ingredientView.updateSauce(id, req.body);
     res.json(sauceActualizada);
-    console.info('Salsa actualizada:', { id, ...sauceActualizada });
+    console.info('Salsa actualizada:', sauceActualizada );
   } catch (error) {
     console.error('Error en PUT /tacos/sauces/:id:', error);
     res.status(500).json({ error: 'Error al actualizar salsa' });

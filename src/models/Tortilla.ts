@@ -1,8 +1,8 @@
-import { ITacoContent } from "../interfaces/i-taco-content";
+import { TacoContent } from "../interfaces/taco-content";
 
 type TTipoTortilla = "single" | "double";
 
-export class Tortilla implements ITacoContent {
+export class Tortilla implements TacoContent {
   private _id?: number;
   public get id(): number | undefined {
     return this._id;
@@ -11,17 +11,17 @@ export class Tortilla implements ITacoContent {
     this._id = value;
   }
   private _nombre: string;
-  public get nombre(): string {
+  public get name(): string {
     return this._nombre;
   }
-  public set nombre(value: string) {
+  public set name(value: string) {
     this._nombre = value;
   }
   private _precio: number;
-  public get precio(): number {
+  public get price(): number {
     return this._precio;
   }
-  public set precio(value: number) {
+  public set price(value: number) {
     this._precio = value;
   }
   private _tipoTortilla: TTipoTortilla;
@@ -50,6 +50,6 @@ export class Tortilla implements ITacoContent {
   }
 
   getPrecioCosto(): number {
-    return this.precio;
+    return this.price;
   }
 }

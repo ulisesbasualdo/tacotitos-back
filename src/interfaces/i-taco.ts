@@ -1,16 +1,9 @@
-import { IFilling, ISauce } from "./i-alimento";
-import { ITacoContent } from "./i-taco-content";
+import { TacoContent } from "./taco-content";
 
 export interface ITaco {
-    id?: number;
-    tortilla: ITacoContent;
-    sauce?: ISauce;
-    fillings: IFilling[];
-}
-
-export interface ITacoStats {
-    value: number | null;
-    tortillaType: string | null;
-    sauce: string | null;
-    fillings: string[] | null;
+  id: number;
+  tortilla: TacoContent;
+  sauce: TacoContent | null;
+  fillings: TacoContent[];
+  doubleTortilla: boolean;
 }

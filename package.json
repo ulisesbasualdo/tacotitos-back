@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/ulisesbasualdo/tacotitos-back#readme",
   "dependencies": {
-    "@prisma/client": "^6.8.2",
+    "@prisma/client": "^7.0.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "mysql2": "^3.14.1"
@@ -31,7 +31,7 @@
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/node": "^22.15.29",
-    "prisma": "^6.8.2",
+    "prisma": "^7.0.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"

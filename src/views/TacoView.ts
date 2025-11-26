@@ -1,14 +1,14 @@
 import { TacoController } from "../controllers/TacoController";
-import { ITacoStats } from "../interfaces/i-taco";
+import { TacoStats } from "../interfaces/taco-stats";
 
 export class TacoView {
   tacoController = new TacoController();
 
-  public getCheapestTaco(): Promise<ITacoStats | null> {
+  public getCheapestTaco(): Promise<TacoStats | null> {
     return this.tacoController.getCheapestTaco();
   }
 
-  public getMostExpensiveTaco(): Promise<ITacoStats | null> {
+  public getMostExpensiveTaco(): Promise<TacoStats | null> {
     return this.tacoController.getMostExpensiveTaco();
   }
 

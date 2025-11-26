@@ -1,37 +1,41 @@
-import { IFilling, ISauce } from "../interfaces/i-alimento";
 import { ITaco } from "../interfaces/i-taco";
-import { ITacoContent } from "../interfaces/i-taco-content";
+import { TacoContent } from "../interfaces/taco-content";
 
 export class Taco implements ITaco {
-  private _id?: number;
-  get id(): number | undefined {
+  private _id: number;
+  get id(): number {
     return this._id;
   }
-  set id(value: number | undefined) {
-    this._id = value;
-  }
 
-  private _sauce?: ISauce;
-  get sauce(): ISauce | undefined {
+  private _sauce: TacoContent;
+  get sauce(): TacoContent {
     return this._sauce;
   }
-  set sauce(value: ISauce | undefined) {
+  set sauce(value: TacoContent) {
     this._sauce = value;
   }
 
-  private _tortilla: ITacoContent;
-  get tortilla(): ITacoContent {
+  private _tortilla: TacoContent;
+  get tortilla(): TacoContent {
     return this._tortilla;
   }
-  set tortilla(value: ITacoContent) {
+  set tortilla(value: TacoContent) {
     this._tortilla = value;
   }
 
-  private _fillings: IFilling[] = [];
-  get fillings(): IFilling[] {
+  private _doubleTortilla: boolean;
+  get doubleTortilla(): boolean{
+    return this._doubleTortilla;
+  }
+  set doubleTortilla(value:boolean) {
+    this._doubleTortilla = value;
+  }
+
+  private _fillings: TacoContent[] = [];
+  get fillings(): TacoContent[] {
     return this._fillings;
   }
-  set fillings(value: IFilling[]) {
+  set fillings(value: TacoContent[]) {
     if (value.length < 1 || value.length > 5) {
       throw new Error("Un taco debe tener entre 1 y 5 rellenos");
     }
@@ -39,30 +43,31 @@ export class Taco implements ITaco {
   }
 
   constructor(
-    tortilla: ITacoContent,
-    fillings: IFilling[] = [],
-    sauce?: ISauce,
-    id?: number
+    tortilla: TacoContent,
+    sauce: TacoContent,
+    doubleTortilla: boolean,
+    fillings: TacoContent[] = [],
   ) {
     if (fillings.length < 1 || fillings.length > 5) {
       throw new Error("Un taco debe tener entre 1 y 5 rellenos");
     }
-    this._id = id;
+    this._id = this.generateId();
     this._tortilla = tortilla;
     this._fillings = fillings;
     this._sauce = sauce;
+    this._doubleTortilla = doubleTortilla;
   }
 
   getPrecioCosto(): number {
-    let costo = this._tortilla.precio;
+    let costo = this._tortilla.price;
 
     if (this._sauce) {
-      costo += this._sauce.precio;
+      costo += this._sauce.price;
     }
 
     if (this._fillings.length > 0) {
       costo += this._fillings.reduce(
-        (sum, filling) => sum + filling.precio,
+        (sum, filling) => sum + filling.price,
         0
       );
     }
@@ -79,13 +84,13 @@ export class Taco implements ITaco {
       id: this._id,
       tortilla: {
         id: this._tortilla.id,
-        nombre: this._tortilla.nombre,
-        precio: this._tortilla.precio,
+        nombre: this._tortilla.name,
+        precio: this._tortilla.price,
       },
       fillings: this._fillings.map((filling) => ({
         id: filling.id,
-        nombre: filling.nombre,
-        precio: filling.precio,
+        nombre: filling.name,
+        precio: filling.price,
       })),
       precio: this.getPrecioCosto(),
     };
@@ -93,11 +98,15 @@ export class Taco implements ITaco {
     if (this._sauce) {
       result.sauce = {
         id: this._sauce.id,
-        nombre: this._sauce.nombre,
-        precio: this._sauce.precio,
+        nombre: this._sauce.name,
+        precio: this._sauce.price,
       };
     }
 
     return result;
+  }
+
+  generateId(): number {
+    return this._id++;
   }
 }

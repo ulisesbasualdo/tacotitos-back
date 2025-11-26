@@ -9,11 +9,8 @@ datasource db {
 
 model Tortilla {
   id           Int      @id @default(autoincrement())
-  nombre       String
-  precio       Float
-  tipoTortilla String   @default("single") // 'single' | 'double'
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  name         String
+  price        Float
   
   // Relaciones
   tacos        Taco[]
@@ -22,10 +19,8 @@ model Tortilla {
 
 model Filling {
   id        Int      @id @default(autoincrement())
-  nombre    String
-  precio    Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  name      String
+  price     Float
   
   // Relaciones
   tacoFillings TacoFilling[]
@@ -34,10 +29,8 @@ model Filling {
 
 model Sauce {
   id        Int      @id @default(autoincrement())
-  nombre    String
-  precio    Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  name      String
+  price     Float
   
   // Relaciones
   tacos     Taco[]
@@ -47,9 +40,8 @@ model Sauce {
 model Taco {
   id         Int      @id @default(autoincrement())
   tortillaId Int
-  sauceId    Int?     // Opcional porque la salsa puede ser null
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  sauceId    Int?
+  doubleTortilla Boolean
   
   // Relaciones
   tortilla   Tortilla @relation(fields: [tortillaId], references: [id])
@@ -63,7 +55,6 @@ model TacoFilling {
   id        Int      @id @default(autoincrement())
   tacoId    Int
   fillingId Int
-  createdAt DateTime @default(now())
   
   // Relaciones
   taco      Taco     @relation(fields: [tacoId], references: [id], onDelete: Cascade)
@@ -71,4 +62,36 @@ model TacoFilling {
   
   @@unique([tacoId, fillingId])
   @@map("taco_fillings")
+}
+
+model Customer {
+  id Int  @id @default(autoincrement())
+  name String
+  cellphone String
+
+  //Relaciones
+  orders Order[]
+}
+
+model Delivery {
+  id Int @id @default(autoincrement())
+  patent String
+  name String
+  cellphone String
+  state String
+
+  //relaciones
+  orders Order[]
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+  datetime DateTime
+  price Float
+  isDelivered Boolean
+
+  customerId Int
+  customer Customer @relation(fields: [customerId], references: [id])
+  deliveryId Int
+  delivery Delivery @relation(fields: [deliveryId], references: [id])
 }

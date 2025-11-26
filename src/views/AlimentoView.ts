@@ -1,19 +1,19 @@
 import { IngredientController } from "../controllers/IngredientController";
-import { IFilling, ISauce } from "../interfaces/i-alimento";
+import { TacoContent } from "../interfaces/taco-content";
 
 export class IngredientView {
   ingredientController = new IngredientController();
 
   // Fillings
-  public getFillings(): Promise<IFilling[]> {
+  public getFillings(): Promise<TacoContent[]> {
     return this.ingredientController.getFillings();
   }
 
-  public addFilling(filling: Partial<IFilling>): Promise<IFilling> {
+  public addFilling(filling: Partial<TacoContent>): Promise<TacoContent> {
     return this.ingredientController.createFilling(filling);
   }
 
-  public updateFilling(id: number, data: IFilling): Promise<IFilling> {
+  public updateFilling(id: number, data: TacoContent): Promise<TacoContent> {
     return this.ingredientController.replaceFilling(id, data);
   }
 
@@ -22,15 +22,15 @@ export class IngredientView {
   }
 
   // Sauces
-  public getSauces(): Promise<ISauce[]> {
+  public getSauces(): Promise<TacoContent[]> {
     return this.ingredientController.getSauces();
   }
 
-  public addSauce(sauce: Partial<ISauce>): Promise<ISauce> {
+  public addSauce(sauce: Partial<TacoContent>): Promise<TacoContent> {
     return this.ingredientController.createSauce(sauce);
   }
 
-  public updateSauce(id: number, data: ISauce): Promise<ISauce> {
+  public updateSauce(id: number, data: TacoContent): Promise<TacoContent> {
     return this.ingredientController.replaceSauce(id, data);
   }
 

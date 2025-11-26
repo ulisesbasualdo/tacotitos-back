@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ITacoStats } from "../interfaces/i-taco";
+import { TacoStats } from "../interfaces/taco-stats";
 import { IngredientController } from "./IngredientController";
 import { TacoContentController } from "./TacoContentController";
 
@@ -14,7 +14,7 @@ export class TacoController {
     this.tortillaController = new TacoContentController();
   }
 
-  public async getCheapestTaco(): Promise<ITacoStats | null> {
+  public async getCheapestTaco(): Promise<TacoStats | null> {
     try {
       const cheapestSauce = await this.ingredientController.getCheapestSauce();
       const cheapestFilling = await this.ingredientController.getCheapestFilling();
@@ -25,15 +25,15 @@ export class TacoController {
       }
 
       const valorTotal =
-        cheapestTortilla.precio +
-        (cheapestSauce?.precio || 0) +
-        cheapestFilling.precio;
+        cheapestTortilla.price +
+        (cheapestSauce?.price || 0) +
+        cheapestFilling.price;
 
-      const cheapestTaco: ITacoStats = {
+      const cheapestTaco: TacoStats = {
         value: valorTotal,
-        tortillaType: cheapestTortilla.nombre,
-        sauce: cheapestSauce?.nombre || null,
-        fillings: [cheapestFilling.nombre],
+        tortillaType: cheapestTortilla.name,
+        sauce: cheapestSauce?.name || null,
+        fillings: [cheapestFilling.name],
       };
 
       return cheapestTaco;
@@ -43,7 +43,7 @@ export class TacoController {
     }
   }
 
-  public async getMostExpensiveTaco(): Promise<ITacoStats | null> {
+  public async getMostExpensiveTaco(): Promise<TacoStats | null> {
     try {
       const expensiveSauce = await this.ingredientController.getMostExpensiveSauce();
       const expensiveFilling = await this.ingredientController.getMostExpensiveFilling();
@@ -56,19 +56,19 @@ export class TacoController {
       // Un taco puede tener hasta 5 rellenos
       const allFillings = await this.ingredientController.getFillings();
       const top5Fillings = allFillings
-        .sort((a, b) => b.precio - a.precio)
+        .sort((a, b) => b.price - a.price)
         .slice(0, 5);
 
       const valorTotal =
-        expensiveTortilla.precio +
-        (expensiveSauce?.precio || 0) +
-        top5Fillings.reduce((sum, f) => sum + f.precio, 0);
+        expensiveTortilla.price +
+        (expensiveSauce?.price || 0) +
+        top5Fillings.reduce((sum, f) => sum + f.price, 0);
 
-      const expensiveTaco: ITacoStats = {
+      const expensiveTaco: TacoStats = {
         value: valorTotal,
-        tortillaType: expensiveTortilla.nombre,
-        sauce: expensiveSauce?.nombre || null,
-        fillings: top5Fillings.map((f) => f.nombre),
+        tortillaType: expensiveTortilla.name,
+        sauce: expensiveSauce?.name || null,
+        fillings: top5Fillings.map((f) => f.name),
       };
 
       return expensiveTaco;

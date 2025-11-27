@@ -1,4 +1,4 @@
-export class Utils {
+export class IDGenerator {
     /**
      * Genera un identificador único universal (UUID) utilizando la API Crypto
      * @returns {string} Un UUID v4 (formato: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx)

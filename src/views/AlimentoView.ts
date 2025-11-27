@@ -14,11 +14,11 @@ export class IngredientView {
   }
 
   public updateFilling(id: number, data: TacoContent): Promise<TacoContent> {
-    return this.ingredientController.replaceFilling(id, data);
+    return this.ingredientController.updateFilling(id, data);
   }
 
   public deleteFilling(id: number): Promise<void> {
-    return this.ingredientController.removeFilling(id);
+    return this.ingredientController.deleteFilling(id);
   }
 
   // Sauces
@@ -31,10 +31,10 @@ export class IngredientView {
   }
 
   public updateSauce(id: number, data: TacoContent): Promise<TacoContent> {
-    return this.ingredientController.replaceSauce(id, data);
+    return this.ingredientController.updateSauce(id, data);
   }
 
   public deleteSauce(id: number): Promise<void> {
-    return this.ingredientController.removeSauce(id);
+    return this.ingredientController.deleteSauce(id);
   }
 }

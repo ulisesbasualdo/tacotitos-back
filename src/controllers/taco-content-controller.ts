@@ -1,82 +1,31 @@
 import { PrismaClient } from "@prisma/client";
 import { TacoContent } from "../interfaces/taco-content";
+import { BaseController } from "./base-controller";
 
-export class TacoContentController {
-  private readonly prisma: PrismaClient;
+type CreateTacoContent = Pick<TacoContent, "name" | "price">
+
+export class TacoContentController extends BaseController<TacoContent, CreateTacoContent> {
 
   constructor() {
-    this.prisma = new PrismaClient();
-  }
-
-  public async listTortillas(): Promise<TacoContent[]> {
-    const tortillas = await this.prisma.tortilla.findMany();
-    return tortillas.map((tortilla: TacoContent) => ({
-      id: tortilla.id,
-      name: tortilla.name,
-      price: tortilla.price,
-    }));
-  }
-
-  public async createTortilla(
-    tortillaData: Partial<TacoContent>
-  ): Promise<TacoContent> {
-    if (!tortillaData.name || tortillaData.price === undefined) {
-      throw new Error("name y price son requeridos para crear una tortilla");
-    }
-
-    const tortillaCreada = await this.prisma.tortilla.create({
-      data: {
-        name: tortillaData.name,
-        price: tortillaData.price,
-      },
-    });
-
-    return tortillaCreada;
-  }
-
-  public async replaceTortilla(
-    id: number,
-    tortillaData: TacoContent
-  ): Promise<TacoContent> {
-    if (!tortillaData.name || tortillaData.price === undefined) {
-      throw new Error(
-        "name y price son requeridos para actualizar una tortilla"
-      );
-    }
-
-    const tortillaActualizada = await this.prisma.tortilla.update({
-      where: { id },
-      data: {
-        name: tortillaData.name,
-        price: tortillaData.price,
-      },
-    });
-
-    return tortillaActualizada;
-  }
-
-  public async removeTortilla(id: number): Promise<void> {
-    await this.prisma.tortilla.delete({
-      where: { id },
-    });
+    super(new PrismaClient().tortilla)
   }
 
   public async getCheapestTortilla(): Promise<TacoContent | null> {
-    const cheapestTortilla = await this.prisma.tortilla.findFirst({
+    const cheapestTortilla = await this.dbDelegate.findFirst({
       orderBy: { price: "asc" },
     });
     return cheapestTortilla ?? null;
   }
 
   public async getMostExpensiveTortilla(): Promise<TacoContent | null> {
-    const expensiveTortilla = await this.prisma.tortilla.findFirst({
+    const expensiveTortilla = await this.dbDelegate.findFirst({
       orderBy: { price: "desc" },
     });
     return expensiveTortilla ?? null;
   }
 
   public async getAverageTortillaPrice(): Promise<number> {
-    const tortillas = await this.prisma.tortilla.findMany();
+    const tortillas = await this.dbDelegate.findMany();
     const total = tortillas.reduce(
       (sum: number, tortilla: TacoContent) => sum + tortilla.price,
       0

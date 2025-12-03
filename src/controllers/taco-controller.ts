@@ -1,23 +1,23 @@
-import { PrismaClient } from "@prisma/client";
 import { TacoStats } from "../interfaces/taco-stats";
-import { IngredientController } from "./ingredient-controller";
-import { TacoContentController } from "./taco-content-controller";
+import { TacoContentController } from "./tortilla-controller";
+import { SauceController } from "./sauce-controller";
+import { FillingController } from "./filling-controller";
 
 export class TacoController {
-  private readonly prisma: PrismaClient;
-  private readonly ingredientController: IngredientController;
+  private readonly sauceController: SauceController;
+  private readonly fillingController: FillingController;
   private readonly tortillaController: TacoContentController;
 
   constructor() {
-    this.prisma = new PrismaClient();
-    this.ingredientController = new IngredientController();
+    this.sauceController = new SauceController();
+    this.fillingController = new FillingController();
     this.tortillaController = new TacoContentController();
   }
 
   public async getCheapestTaco(): Promise<TacoStats | null> {
-    const cheapestSauce = await this.ingredientController.getCheapestSauce();
+    const cheapestSauce = await this.sauceController.getCheapestSauce();
     const cheapestFilling =
-      await this.ingredientController.getCheapestFilling();
+      await this.fillingController.getCheapestFilling();
     const cheapestTortilla =
       await this.tortillaController.getCheapestTortilla();
 
@@ -42,9 +42,9 @@ export class TacoController {
 
   public async getMostExpensiveTaco(): Promise<TacoStats | null> {
     const expensiveSauce =
-      await this.ingredientController.getMostExpensiveSauce();
+      await this.sauceController.getMostExpensiveSauce();
     const expensiveFilling =
-      await this.ingredientController.getMostExpensiveFilling();
+      await this.fillingController.getMostExpensiveFilling();
     const expensiveTortilla =
       await this.tortillaController.getMostExpensiveTortilla();
 
@@ -53,7 +53,7 @@ export class TacoController {
     }
 
     // Un taco puede tener hasta 5 rellenos
-    const allFillings = await this.ingredientController.getFillings();
+    const allFillings = await this.fillingController.getAll();
     const top5Fillings = allFillings
       .sort((a, b) => b.price - a.price)
       .slice(0, 5);
@@ -75,9 +75,9 @@ export class TacoController {
 
   public async getAverageTacoPrice(): Promise<number> {
     const averageSaucePrice =
-      await this.ingredientController.getAverageSaucePrice();
+      await this.sauceController.getAverageSaucePrice();
     const averageFillingPrice =
-      await this.ingredientController.getAverageFillingPrice();
+      await this.fillingController.getAverageFillingPrice();
     const averageTortillaPrice =
       await this.tortillaController.getAverageTortillaPrice();
 

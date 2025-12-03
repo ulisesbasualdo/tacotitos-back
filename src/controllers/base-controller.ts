@@ -1,7 +1,7 @@
 export interface Delegate<T> {
   findUnique(args: { where: { id: number } }): Promise<T | null>;
   findMany(args?: any): Promise<T[]>;
-  findFirst(args?: any): Promise<T>;
+  findFirst(args?: any): Promise<T | null>;
   create(args: { data: any }): Promise<T>;
   update(args: { where: { id: number }; data: any }): Promise<T>;
   delete(args: { where: { id: number } }): Promise<T>;
@@ -20,7 +20,7 @@ export class BaseController<T, CreateType> {
     return this.dbDelegate.findMany();
   }
 
-  public async getFirst(): Promise<T> {
+  public async getFirst(): Promise<T | null> {
     return this.dbDelegate.findFirst();
   }
 

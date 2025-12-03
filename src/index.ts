@@ -1,8 +1,9 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { TacoView } from "./views/TacoView";
-import { IngredientView } from "./views/AlimentoView";
-import { TacoContentView } from "./views/TacoContentView";
+import { TacoView } from "./views/taco-view";
+import { FillingView } from "./views/filling-view";
+import { SauceVIew } from "./views/sauce-view";
+import { TortillaView } from "./views/tortilla-view";
 import { asyncHandler } from "./utils/async-handler";
 
 const app = express();
@@ -19,14 +20,15 @@ app.use(
 app.use(express.json());
 
 const tacoView = new TacoView();
-const ingredientView = new IngredientView();
-const tacoContentView = new TacoContentView();
+const fillingView = new FillingView();
+const sauceVIew = new SauceVIew();
+const tortillaView = new TortillaView();
 
 //#region Tortillas
 app.get(
   "/tacos/tortillas",
   asyncHandler(async (req: Request, res: Response) => {
-    const tortillas = await tacoContentView.listTortillas();
+    const tortillas = await tortillaView.get();
     res.json(tortillas);
   })
 );
@@ -34,7 +36,7 @@ app.get(
 app.post(
   "/tacos/tortillas",
   asyncHandler(async (req: Request, res: Response) => {
-    const tortillaCreada = await tacoContentView.addTortilla(req.body);
+    const tortillaCreada = await tortillaView.add(req.body);
     res.status(201).json(tortillaCreada);
   })
 );
@@ -43,7 +45,7 @@ app.put(
   "/tacos/tortillas/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const id = Number.parseInt(req.params.id, 10);
-    const tortillaActualizada = await tacoContentView.updateTortilla(
+    const tortillaActualizada = await tortillaView.update(
       id,
       req.body
     );
@@ -55,7 +57,7 @@ app.delete(
   "/tacos/tortillas/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const id = Number.parseInt(req.params.id, 10);
-    await tacoContentView.deleteTortilla(id);
+    await tortillaView.delete(id);
     res.status(204).send();
   })
 );
@@ -64,7 +66,7 @@ app.delete(
 app.get(
   "/tacos/fillings",
   asyncHandler(async (req: Request, res: Response) => {
-    const fillings = await ingredientView.getFillings();
+    const fillings = await fillingView.get();
     res.json(fillings);
   })
 );
@@ -72,7 +74,7 @@ app.get(
 app.post(
   "/tacos/fillings",
   asyncHandler(async (req: Request, res: Response) => {
-    const fillingCreado = await ingredientView.addFilling(req.body);
+    const fillingCreado = await fillingView.add(req.body);
     res.status(201).json(fillingCreado);
   })
 );
@@ -81,7 +83,7 @@ app.put(
   "/tacos/fillings/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const id = Number.parseInt(req.params.id, 10);
-    const fillingActualizado = await ingredientView.updateFilling(id, req.body);
+    const fillingActualizado = await fillingView.update(id, req.body);
     res.json(fillingActualizado);
   })
 );
@@ -90,7 +92,7 @@ app.delete(
   "/tacos/fillings/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const id = Number.parseInt(req.params.id, 10);
-    await ingredientView.deleteFilling(id);
+    await fillingView.delete(id);
     res.status(204).send();
   })
 );
@@ -99,7 +101,7 @@ app.delete(
 app.get(
   "/tacos/sauces",
   asyncHandler(async (req: Request, res: Response) => {
-    const sauces = await ingredientView.getSauces();
+    const sauces = await sauceVIew.get();
     res.json(sauces);
   })
 );
@@ -107,7 +109,7 @@ app.get(
 app.post(
   "/tacos/sauces",
   asyncHandler(async (req: Request, res: Response) => {
-    const sauceCreada = await ingredientView.addSauce(req.body);
+    const sauceCreada = await sauceVIew.add(req.body);
     res.status(201).json(sauceCreada);
   })
 );
@@ -116,7 +118,7 @@ app.put(
   "/tacos/sauces/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const id = Number.parseInt(req.params.id, 10);
-    const sauceActualizada = await ingredientView.updateSauce(id, req.body);
+    const sauceActualizada = await sauceVIew.update(id, req.body);
     res.json(sauceActualizada);
     console.info("Salsa actualizada:", sauceActualizada);
   })
@@ -126,7 +128,7 @@ app.delete(
   "/tacos/sauces/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const id = Number.parseInt(req.params.id, 10);
-    await ingredientView.deleteSauce(id);
+    await sauceVIew.delete(id);
     res.status(204).send();
     console.info("Salsa eliminada con ID:", id);
   })

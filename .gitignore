@@ -18,6 +18,8 @@ build/
 
 # Prisma
 /src/generated/prisma
+/generated
+/generated/prisma
 
 # Base de datos SQLite (desarrollo)
 prisma/dev.db

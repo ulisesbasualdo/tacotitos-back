@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../prisma/prisma";
 import { TacoContent } from "../interfaces/taco-content";
 import { BaseController } from "./base-controller";
 
@@ -7,7 +7,7 @@ type CreateTacoContent = Pick<TacoContent, "name" | "price">
 export class TacoContentController extends BaseController<TacoContent, CreateTacoContent> {
 
   constructor() {
-    super(new PrismaClient().tortilla)
+    super(prisma.tortilla)
   }
 
   public async getCheapestTortilla(): Promise<TacoContent | null> {

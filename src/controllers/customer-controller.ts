@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../prisma/prisma"
 import { Customer } from "../interfaces/customer";
 import { BaseController } from "./base-controller";
 
@@ -9,6 +9,6 @@ export class CustomerController extends BaseController<
   CreateCustomer
 > {
   constructor() {
-    super(new PrismaClient().customer);
+    super(prisma.customer);
   }
 }
